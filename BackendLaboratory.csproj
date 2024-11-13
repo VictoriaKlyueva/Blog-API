@@ -27,7 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Data\DTO\" />
+    <Folder Include="Models\" />
     <Folder Include="Services\IServices\" />
+    <Folder Include="Views\" />
   </ItemGroup>
 
 </Project>
