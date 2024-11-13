@@ -3,6 +3,5 @@
     public interface IUserRepositorycs
     {
         bool IsUniqueUser(string username);
-        Task<Login>
     }
 }
