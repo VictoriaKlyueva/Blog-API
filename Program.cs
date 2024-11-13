@@ -1,4 +1,6 @@
 using BackendLaboratory.Data;
+using BackendLaboratory.Repository;
+using BackendLaboratory.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +11,7 @@ builder.Services.AddDbContext<AppDBContext>(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Add services to swagger
 builder.Services.AddEndpointsApiExplorer();
