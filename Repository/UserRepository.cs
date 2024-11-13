@@ -85,5 +85,10 @@ namespace BackendLaboratory.Repository
             user.Password = AppConstants.EmptyString;
             return user;
         }
+
+        public async Task Logout(string userId)
+        {
+            await Task.CompletedTask;
+        }
     }
 }

@@ -9,5 +9,6 @@ namespace BackendLaboratory.Repository.IRepository
         bool IsUniqueUser(string username);
         Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO);
         Task<LocalUser> Register(RegisterationRequestDTO registerationRequestDTO);
+        Task Logout(string userId);
     }
 }

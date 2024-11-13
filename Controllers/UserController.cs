@@ -4,6 +4,7 @@ using BackendLaboratory.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System.Net;
+using System.Security.Claims;
 
 namespace BackendLaboratory.Controllers
 {
@@ -63,6 +64,23 @@ namespace BackendLaboratory.Controllers
             }
 
             FillResponse(HttpStatusCode.OK, true, null, user);
+            return Ok(_response);
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = User.FindFirst(ClaimTypes.Name)?.Value;
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                FillResponse(HttpStatusCode.Unauthorized, false, "User not authenticated", null);
+                return Unauthorized(_response);
+            }
+
+            await _userRepository.Logout(userId);
+            
+            FillResponse(HttpStatusCode.OK, true, null, "Successfully logged out");
             return Ok(_response);
         }
     }
