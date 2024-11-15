@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace BackendLaboratory.Controllers
 {
-    [Route("api/UserAuth")]
+    [Route("api/account")]
     [ApiController]
     public class UserController : Controller
     {
