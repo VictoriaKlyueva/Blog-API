@@ -1,5 +1,4 @@
 ﻿using BackendLaboratory.Data;
-using BackendLaboratory.Data.DTO;
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Repository.IRepository;
 using Microsoft.IdentityModel.Tokens;
@@ -20,9 +19,9 @@ namespace BackendLaboratory.Repository
             secretKey = configuration.GetValue<string>("ApiSettings:Secret");
         }
 
-        public bool IsUniqueUser(string username)
+        public bool IsUniqueUser(string email)
         {
-            var user = _db.Users.FirstOrDefault(x => x.UserName == username);
+            var user = _db.Users.FirstOrDefault(x => x.Email == email);
             if (user == null) 
             {
                 return true;
@@ -30,20 +29,8 @@ namespace BackendLaboratory.Repository
             return false;
         }
 
-        public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
+        public TokenResponse GenerateToken(User user)
         {
-            var user = _db.Users.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower()
-            && u.Password == loginRequestDTO.Password);
-
-            if (user == null) 
-            {
-                return new LoginResponseDTO()
-                {
-                    Token = AppConstants.EmptyString,
-                    User = null
-                };
-            }
-
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(secretKey);
 
@@ -51,8 +38,7 @@ namespace BackendLaboratory.Repository
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role),
+                    new Claim(ClaimTypes.Sid, user.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(AppConstants.TokenExpiration),
                 SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -60,30 +46,46 @@ namespace BackendLaboratory.Repository
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            LoginResponseDTO loginResponseDTO = new LoginResponseDTO()
+            return new TokenResponse()
             {
-                Token = tokenHandler.WriteToken(token),
-                User = user,
+                Token = tokenHandler.WriteToken(token)
             };
-
-            return loginResponseDTO;
         }
 
-        public async Task<LocalUser> Register(RegisterationRequestDTO registerationRequestDTO)
+        public async Task<TokenResponse> Login(LoginCredentials loginCredentials)
         {
-            LocalUser user = new()
+            var user = _db.Users.FirstOrDefault(u => u.Email == loginCredentials.Email
+            && u.Password == loginCredentials.Password);
+
+            if (user == null) 
             {
-                UserName = registerationRequestDTO.UserName,
-                Password = registerationRequestDTO.Password,
-                Name = registerationRequestDTO.Name,
-                Role = registerationRequestDTO.Role,
+                return new TokenResponse()
+                {
+                    Token = AppConstants.EmptyString
+                };
+            }
+
+            return GenerateToken(user);
+        }
+
+        public async Task<TokenResponse> Register(UserRegisterModel userRegisterModel)
+        {
+            User user = new()
+            {
+                Id = Guid.NewGuid(),
+                CreateTime = DateTime.UtcNow,
+                FullName = userRegisterModel.FullName,
+                Password = userRegisterModel.Password,
+                Email = userRegisterModel.Email,
+                BirthDate = userRegisterModel.BirthDate,
+                Gender = userRegisterModel.Gender,
+                PhoneNumber = userRegisterModel.PhoneNumber,
             };
 
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
 
-            user.Password = AppConstants.EmptyString;
-            return user;
+            return GenerateToken(user);
         }
 
         public async Task Logout(string userId)
