@@ -1,7 +1,7 @@
 ﻿using BackendLaboratory.Data;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BackendLaboratory.Util
+namespace BackendLaboratory.Util.Token
 {
     public class TokenBlackListPolicy : AuthorizationHandler<TokenBlackListRequirment>
     {
@@ -11,7 +11,7 @@ namespace BackendLaboratory.Util
         {
             _serviceProvider = serviceProvider;
         }
-        
+
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, TokenBlackListRequirment requirement)
         {
             using (var scope = _serviceProvider.CreateScope())

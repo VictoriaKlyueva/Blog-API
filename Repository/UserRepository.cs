@@ -2,8 +2,10 @@
 using BackendLaboratory.Data;
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Repository.IRepository;
-using BackendLaboratory.Util;
+using BackendLaboratory.Util.Password;
+using BackendLaboratory.Util.Token;
 using BackendLaboratory.Util.Validators;
+using System.Numerics;
 
 namespace BackendLaboratory.Repository
 {
@@ -31,7 +33,7 @@ namespace BackendLaboratory.Repository
         public async Task<TokenResponse> Login(LoginCredentials loginCredentials)
         {
             var user = _db.Users.FirstOrDefault(u => u.Email == loginCredentials.Email
-            && u.Password == loginCredentials.Password);
+                && !HashingPassword.VerifyPassword(u.Password, loginCredentials.Password));
 
             if (user == null) 
             {
@@ -77,7 +79,7 @@ namespace BackendLaboratory.Repository
                 Id = Guid.NewGuid(),
                 CreateTime = DateTime.UtcNow,
                 FullName = userRegisterModel.FullName,
-                Password = userRegisterModel.Password,
+                Password = HashingPassword.HashPassword(userRegisterModel.Password),
                 Email = userRegisterModel.Email,
                 BirthDate = userRegisterModel.BirthDate,
                 Gender = userRegisterModel.Gender,

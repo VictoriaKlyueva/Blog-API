@@ -2,6 +2,7 @@ using BackendLaboratory.Data;
 using BackendLaboratory.Repository;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util;
+using BackendLaboratory.Util.Token;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
