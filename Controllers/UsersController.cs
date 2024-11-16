@@ -1,9 +1,6 @@
-﻿using BackendLaboratory.Data.DTO;
-using BackendLaboratory.Data.Entities;
-using BackendLaboratory.Models;
+﻿using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System.Net;
 using System.Security.Claims;
 
