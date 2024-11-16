@@ -3,6 +3,7 @@ using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -13,11 +14,13 @@ namespace BackendLaboratory.Repository
     {
         private readonly AppDBContext _db;
         private readonly TokenHelper _tokenHelper;
+        private readonly ITokenBlacklistRepository _tokenBlacklistRepository;
 
-        public UserRepository(AppDBContext db, IConfiguration configuration)
+        public UserRepository(AppDBContext db, IConfiguration configuration, ITokenBlacklistRepository tokenBlacklistRepository)
         {
             _db = db;
             _tokenHelper = new TokenHelper(configuration);
+            _tokenBlacklistRepository = tokenBlacklistRepository;
         }
 
         public bool IsUniqueUser(string email)
@@ -66,9 +69,9 @@ namespace BackendLaboratory.Repository
             return _tokenHelper.GenerateToken(user);
         }
 
-        public async Task Logout(string userId)
+        public async Task Logout(string token)
         {
-            await Task.CompletedTask;
+            await _tokenBlacklistRepository.AddToBlacklist(token);
         }
     }
 }

@@ -9,10 +9,12 @@ namespace BackendLaboratory.Util
     public class TokenHelper
     {
         private readonly string _secretKey;
+        private JwtSecurityTokenHandler _tokenHandler;
 
         public TokenHelper(IConfiguration configuration)
         {
             _secretKey = configuration.GetValue<string>("ApiSettings:Secret");
+            _tokenHandler = new JwtSecurityTokenHandler();
         }
 
         public TokenResponse GenerateToken(User user)
@@ -36,6 +38,19 @@ namespace BackendLaboratory.Util
             {
                 Token = tokenHandler.WriteToken(token)
             };
+        }
+
+        public string GetIdFromToken(string token)
+        {
+            var jwtToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
+            if (jwtToken == null)
+            {
+                Console.WriteLine(jwtToken);
+            }
+
+            var doctorId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid).Value;
+
+            return doctorId;
         }
     }
 }

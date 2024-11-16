@@ -1,5 +1,6 @@
 ﻿using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Security.Claims;
@@ -48,18 +49,17 @@ namespace BackendLaboratory.Controllers
         }
 
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
+        [Authorize]
+        public async Task<IActionResult> Logout([FromHeader] string token)
         {
-            var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
-
-            if (string.IsNullOrWhiteSpace(userId))
+            if (string.IsNullOrEmpty(token))
             {
-                return Unauthorized();
+                return BadRequest("Token is required for logout.");
             }
 
-            await _userRepository.Logout(userId);
-            
+            await _userRepository.Logout(token);
             return Ok();
         }
+
     }
 }
