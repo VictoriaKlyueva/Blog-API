@@ -1,8 +1,9 @@
-﻿using BackendLaboratory.Data;
+﻿using BackendLaboratory.Constants;
+using BackendLaboratory.Data;
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util;
-using Microsoft.EntityFrameworkCore;
+using BackendLaboratory.Util.Validators;
 
 namespace BackendLaboratory.Repository
 {
@@ -43,8 +44,34 @@ namespace BackendLaboratory.Repository
             return _tokenHelper.GenerateToken(user);
         }
 
+        private void ValidateUserRegistration(UserRegisterModel userRegisterModel)
+        {
+            if (!RegisterValidator.IsEmailValid(userRegisterModel.Email))
+            {
+                throw new Exception(ErrorMessages.InvalidEmail);
+            }
+            if (!RegisterValidator.IsBirthDateValid(userRegisterModel.BirthDate))
+            {
+                throw new Exception(ErrorMessages.InvalidBirthDate);
+            }
+            if (!RegisterValidator.IsFullnameValid(userRegisterModel.FullName))
+            {
+                throw new Exception(ErrorMessages.InvalidFullName);
+            }
+            if (!RegisterValidator.IsPasswordStrong(userRegisterModel.Password))
+            {
+                throw new Exception(ErrorMessages.WeakPassword);
+            }
+            if (!RegisterValidator.IsPhoneValid(userRegisterModel.PhoneNumber))
+            {
+                throw new Exception(ErrorMessages.InvalidPhoneNumber);
+            }
+        }
+
         public async Task<TokenResponse> Register(UserRegisterModel userRegisterModel)
         {
+            ValidateUserRegistration(userRegisterModel);
+
             User user = new()
             {
                 Id = Guid.NewGuid(),

@@ -2,8 +2,6 @@
 using BackendLaboratory.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using System.Security.Claims;
 
 namespace BackendLaboratory.Controllers
 {
@@ -53,8 +51,6 @@ namespace BackendLaboratory.Controllers
         public async Task<IActionResult> Logout()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-
-
 
             if (string.IsNullOrEmpty(token))
             {
