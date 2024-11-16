@@ -49,7 +49,7 @@ namespace BackendLaboratory.Controllers
         }
 
         [HttpPost("logout")]
-        [Authorize]
+        [Authorize(Policy = "TokenBlackListPolicy")]
         public async Task<IActionResult> Logout()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");

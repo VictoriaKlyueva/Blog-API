@@ -2,6 +2,7 @@
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackendLaboratory.Repository
 {
@@ -64,7 +65,17 @@ namespace BackendLaboratory.Repository
 
         public async Task Logout(string token)
         {
-            await Task.CompletedTask;
+            string id = _tokenHelper.GetIdFromToken(token);
+
+            if (Guid.TryParse(id, out Guid doctorId) && doctorId != Guid.Empty)
+            {
+                await _db.BlackTokens.AddAsync(new BlackToken { Blacktoken = token });
+                await _db.SaveChangesAsync();
+            }
+            else
+            {
+                throw new Exception("Некорректный ID: не удалось извлечь или преобразовать id из токена.");
+            }
         }
     }
 }
