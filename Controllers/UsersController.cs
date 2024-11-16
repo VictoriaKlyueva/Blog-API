@@ -50,8 +50,10 @@ namespace BackendLaboratory.Controllers
 
         [HttpPost("logout")]
         [Authorize]
-        public async Task<IActionResult> Logout([FromHeader] string token)
+        public async Task<IActionResult> Logout()
         {
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
             if (string.IsNullOrEmpty(token))
             {
                 return BadRequest("Token is required for logout.");
@@ -60,6 +62,5 @@ namespace BackendLaboratory.Controllers
             await _userRepository.Logout(token);
             return Ok();
         }
-
     }
 }

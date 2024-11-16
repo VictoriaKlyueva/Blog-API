@@ -48,9 +48,9 @@ namespace BackendLaboratory.Util
                 Console.WriteLine(jwtToken);
             }
 
-            var doctorId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid).Value;
+            var id = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid).Value;
 
-            return doctorId;
+            return id;
         }
     }
 }

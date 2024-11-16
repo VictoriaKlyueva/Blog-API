@@ -9,13 +9,11 @@ namespace BackendLaboratory.Repository
     {
         private readonly AppDBContext _db;
         private readonly TokenHelper _tokenHelper;
-        private readonly ITokenBlacklistRepository _tokenBlacklistRepository;
 
-        public UserRepository(AppDBContext db, IConfiguration configuration, ITokenBlacklistRepository tokenBlacklistRepository)
+        public UserRepository(AppDBContext db, IConfiguration configuration)
         {
             _db = db;
             _tokenHelper = new TokenHelper(configuration);
-            _tokenBlacklistRepository = tokenBlacklistRepository;
         }
 
         public bool IsUniqueUser(string email)
@@ -66,7 +64,7 @@ namespace BackendLaboratory.Repository
 
         public async Task Logout(string token)
         {
-            await _tokenBlacklistRepository.AddToBlacklist(token);
+            await Task.CompletedTask;
         }
     }
 }

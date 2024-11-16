@@ -1,5 +1,4 @@
 using BackendLaboratory.Data;
-using BackendLaboratory.Middlewares;
 using BackendLaboratory.Repository;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util;
@@ -56,8 +55,6 @@ builder.Services.AddAuthorization(services =>
     services.AddPolicy("TokenBlackListPolicy", policy => policy.Requirements.Add(new TokenBlackListRequirment()));
 });
 
-builder.Services.AddScoped<ITokenBlacklistRepository, TokenBlacklistRepository>();
-
 // Configure JWT authentication
 var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
 builder.Services.AddAuthentication(options =>
@@ -83,8 +80,6 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
-
-app.UseMiddleware<TokenBlacklistMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
