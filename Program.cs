@@ -3,6 +3,7 @@ using BackendLaboratory.Repository;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -13,10 +14,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to EntityFramework
 builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Add services to swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -54,6 +51,11 @@ builder.Services.AddAuthorization(services =>
 {
     services.AddPolicy("TokenBlackListPolicy", policy => policy.Requirements.Add(new TokenBlackListRequirment()));
 });
+
+builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<IAuthorizationHandler, TokenBlackListPolicy>();
 
 // Configure JWT authentication
 var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");

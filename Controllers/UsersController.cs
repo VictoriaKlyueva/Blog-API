@@ -54,6 +54,8 @@ namespace BackendLaboratory.Controllers
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
+
+
             if (string.IsNullOrEmpty(token))
             {
                 return BadRequest("Token is required for logout.");
