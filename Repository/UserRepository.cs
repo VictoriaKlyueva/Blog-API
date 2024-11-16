@@ -2,6 +2,7 @@
 using BackendLaboratory.Data;
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Repository.IRepository;
+using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Password;
 using BackendLaboratory.Util.Token;
 using BackendLaboratory.Util.Validators;
@@ -50,23 +51,23 @@ namespace BackendLaboratory.Repository
         {
             if (!RegisterValidator.IsEmailValid(userRegisterModel.Email))
             {
-                throw new Exception(ErrorMessages.InvalidEmail);
+                throw new BadRequestException(ErrorMessages.InvalidEmail);
             }
             if (!RegisterValidator.IsBirthDateValid(userRegisterModel.BirthDate))
             {
-                throw new Exception(ErrorMessages.InvalidBirthDate);
+                throw new BadRequestException(ErrorMessages.InvalidBirthDate);
             }
             if (!RegisterValidator.IsFullnameValid(userRegisterModel.FullName))
             {
-                throw new Exception(ErrorMessages.InvalidFullName);
+                throw new BadRequestException(ErrorMessages.InvalidFullName);
             }
             if (!RegisterValidator.IsPasswordStrong(userRegisterModel.Password))
             {
-                throw new Exception(ErrorMessages.WeakPassword);
+                throw new BadRequestException(ErrorMessages.WeakPassword);
             }
             if (!RegisterValidator.IsPhoneValid(userRegisterModel.PhoneNumber))
             {
-                throw new Exception(ErrorMessages.InvalidPhoneNumber);
+                throw new BadRequestException(ErrorMessages.InvalidPhoneNumber);
             }
         }
 

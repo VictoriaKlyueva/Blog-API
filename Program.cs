@@ -2,9 +2,11 @@ using BackendLaboratory.Data;
 using BackendLaboratory.Repository;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util;
+using BackendLaboratory.Util.CustomExceptions;
 using BackendLaboratory.Util.Token;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -100,6 +102,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Configure custom middlewares
+app.UseMiddleware<ExceptionMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
