@@ -72,8 +72,8 @@ namespace BackendLaboratory.Controllers
         {
             string token = GetTokenFromHeader();
 
-            await _userRepository.GetProfile(token);
-            return Ok();
+            var response = await _userRepository.GetProfile(token);
+            return Ok(response);
         }
     }
 }
