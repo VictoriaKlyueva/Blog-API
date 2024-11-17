@@ -1,4 +1,5 @@
-﻿using BackendLaboratory.Data.Entities;
+﻿using BackendLaboratory.Data.DTO;
+using BackendLaboratory.Data.Entities;
 
 namespace BackendLaboratory.Repository.IRepository
 {
@@ -8,5 +9,6 @@ namespace BackendLaboratory.Repository.IRepository
         Task<TokenResponse> Login(LoginCredentials loginCredentials);
         Task<TokenResponse> Register(UserRegisterModel userRegisterModel);
         Task Logout(string userId);
+        Task<UserDto> GetProfile(string userId);
     }
 }

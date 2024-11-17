@@ -1,11 +1,13 @@
 ﻿using BackendLaboratory.Constants;
 using BackendLaboratory.Data;
+using BackendLaboratory.Data.DTO;
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Password;
 using BackendLaboratory.Util.Token;
 using BackendLaboratory.Util.Validators;
+using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 
 namespace BackendLaboratory.Repository
@@ -104,8 +106,27 @@ namespace BackendLaboratory.Repository
             }
             else
             {
-                throw new Exception("Некорректный ID: не удалось извлечь или преобразовать id из токена.");
+                throw new BadRequestException(ErrorMessages.IncorrectId);
             }
+        }
+
+        public async Task<UserDto> GetProfile(string token)
+        {
+            string userId = _tokenHelper.GetIdFromToken(token);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+
+            if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            return new UserDto
+            {
+                Id = Guid.NewGuid(),
+                CreateTime = DateTime.UtcNow,
+                FullName = user.FullName,
+                BirthDate = user.BirthDate,
+                Gender = user.Gender,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+            };
         }
     }
 }

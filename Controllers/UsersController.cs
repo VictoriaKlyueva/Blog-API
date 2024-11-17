@@ -11,6 +11,11 @@ namespace BackendLaboratory.Controllers
     {
         private readonly IUserRepository _userRepository;
 
+        private string GetTokenFromHeader()
+        {
+            return HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        }
+
         public UsersController(IUserRepository userRepository)
         {
             _userRepository = userRepository;
@@ -50,7 +55,7 @@ namespace BackendLaboratory.Controllers
         [Authorize(Policy = "TokenBlackListPolicy")]
         public async Task<IActionResult> Logout()
         {
-            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            string token = GetTokenFromHeader();
 
             if (string.IsNullOrEmpty(token))
             {
@@ -58,6 +63,16 @@ namespace BackendLaboratory.Controllers
             }
 
             await _userRepository.Logout(token);
+            return Ok();
+        }
+
+        [HttpGet("profile")]
+        [Authorize(Policy = "TokenBlackListPolicy")]
+        public async Task<IActionResult> GetProfile()
+        {
+            string token = GetTokenFromHeader();
+
+            await _userRepository.GetProfile(token);
             return Ok();
         }
     }
