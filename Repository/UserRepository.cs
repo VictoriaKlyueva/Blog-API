@@ -35,10 +35,9 @@ namespace BackendLaboratory.Repository
 
         public async Task<TokenResponse> Login(LoginCredentials loginCredentials)
         {
-            var user = _db.Users.FirstOrDefault(u => u.Email == loginCredentials.Email
-                && !HashingPassword.VerifyPassword(u.Password, loginCredentials.Password));
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == loginCredentials.Email);
 
-            if (user == null) 
+            if (user == null || !HashingPassword.VerifyPassword(loginCredentials.Password, user.Password))
             {
                 return new TokenResponse()
                 {
@@ -51,6 +50,10 @@ namespace BackendLaboratory.Repository
 
         private void ValidateUser(UserRegisterModel userRegisterModel)
         {
+            if (!IsUniqueUser(userRegisterModel.Email))
+            {
+                throw new BadRequestException(ErrorMessages.InvalidUser);
+            }
             if (!RegisterValidator.IsEmailValid(userRegisterModel.Email))
             {
                 throw new BadRequestException(ErrorMessages.InvalidEmail);
@@ -155,6 +158,10 @@ namespace BackendLaboratory.Repository
 
             string userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+            if (user != _db.Users.FirstOrDefault(x => x.Email == UserEditModel.Email))
+            {
+                throw new BadRequestException(ErrorMessages.InvalidUser);
+            }
 
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 
