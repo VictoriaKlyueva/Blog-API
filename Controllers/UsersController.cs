@@ -75,5 +75,15 @@ namespace BackendLaboratory.Controllers
             var response = await _userRepository.GetProfile(token);
             return Ok(response);
         }
+
+        [HttpPut("profile")]
+        [Authorize(Policy = "TokenBlackListPolicy")]
+        public async Task<IActionResult> EditProfile([FromBody] UserEditModel model)
+        {
+            string token = GetTokenFromHeader();
+
+            await _userRepository.EditProfile(token, model);
+            return Ok();
+        }
     }
 }

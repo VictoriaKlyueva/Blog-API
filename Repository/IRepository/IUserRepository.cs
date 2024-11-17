@@ -9,6 +9,7 @@ namespace BackendLaboratory.Repository.IRepository
         Task<TokenResponse> Login(LoginCredentials loginCredentials);
         Task<TokenResponse> Register(UserRegisterModel userRegisterModel);
         Task Logout(string userId);
-        Task<UserDto> GetProfile(string userId);
+        Task<UserDto> GetProfile(string token);
+        Task EditProfile(string token, UserEditModel userEditModel);
     }
 }

@@ -49,7 +49,7 @@ namespace BackendLaboratory.Repository
             return _tokenHelper.GenerateToken(user);
         }
 
-        private void ValidateUserRegistration(UserRegisterModel userRegisterModel)
+        private void ValidateUser(UserRegisterModel userRegisterModel)
         {
             if (!RegisterValidator.IsEmailValid(userRegisterModel.Email))
             {
@@ -73,9 +73,29 @@ namespace BackendLaboratory.Repository
             }
         }
 
+        private void ValidateUser(UserEditModel userEditModel)
+        {
+            if (!RegisterValidator.IsEmailValid(userEditModel.Email))
+            {
+                throw new BadRequestException(ErrorMessages.InvalidEmail);
+            }
+            if (!RegisterValidator.IsBirthDateValid(userEditModel.BirthDate))
+            {
+                throw new BadRequestException(ErrorMessages.InvalidBirthDate);
+            }
+            if (!RegisterValidator.IsFullnameValid(userEditModel.FullName))
+            {
+                throw new BadRequestException(ErrorMessages.InvalidFullName);
+            }
+            if (!RegisterValidator.IsPhoneValid(userEditModel.PhoneNumber))
+            {
+                throw new BadRequestException(ErrorMessages.InvalidPhoneNumber);
+            }
+        }
+
         public async Task<TokenResponse> Register(UserRegisterModel userRegisterModel)
         {
-            ValidateUserRegistration(userRegisterModel);
+            ValidateUser(userRegisterModel);
 
             User user = new()
             {
@@ -127,6 +147,24 @@ namespace BackendLaboratory.Repository
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
             };
+        }
+
+        public async Task EditProfile(string token, UserEditModel UserEditModel)
+        {
+            ValidateUser(UserEditModel);
+
+            string userId = _tokenHelper.GetIdFromToken(token);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+
+            if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            user.Email = UserEditModel.Email;
+            user.FullName = UserEditModel.FullName;
+            user.BirthDate = UserEditModel.BirthDate;
+            user.Gender = UserEditModel.Gender;
+            user.PhoneNumber = UserEditModel.PhoneNumber;
+
+            await _db.SaveChangesAsync();
         }
     }
 }
