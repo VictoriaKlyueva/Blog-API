@@ -11,14 +11,14 @@ namespace BackendLaboratory.Controllers
     {
         private readonly IUserRepository _userRepository;
 
-        private string GetTokenFromHeader()
-        {
-            return HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-        }
-
         public UsersController(IUserRepository userRepository)
         {
             _userRepository = userRepository;
+        }
+
+        private string GetTokenFromHeader()
+        {
+            return HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         }
 
         [HttpPost("login")]
