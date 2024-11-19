@@ -52,7 +52,7 @@ namespace BackendLaboratory.Repository
         {
             if (!IsUniqueUser(userRegisterModel.Email))
             {
-                throw new BadRequestException(ErrorMessages.InvalidUser);
+                throw new BadRequestException(ErrorMessages.UserIsAlreadyExcist);
             }
             if (!RegisterValidator.IsEmailValid(userRegisterModel.Email))
             {
@@ -160,7 +160,7 @@ namespace BackendLaboratory.Repository
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user != _db.Users.FirstOrDefault(x => x.Email == UserEditModel.Email))
             {
-                throw new BadRequestException(ErrorMessages.InvalidUser);
+                throw new BadRequestException(ErrorMessages.UserIsAlreadyExcist);
             }
 
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }

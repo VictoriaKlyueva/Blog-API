@@ -9,6 +9,8 @@
         public const string InvalidPhoneNumber = "Неверный формат номера телефона. Телефон должен соответствовать маске +7 (xxx) xxx-xx-xx.";
         public const string IncorrectId = "Некорректный ID: не удалось извлечь или преобразовать id из токена.";
         public const string ProfileNotFound = "Пользователь не авторизован.";
-        public const string InvalidUser = "Такой пользователь уже существует.";
+        public const string UserIsAlreadyExcist = "Такой пользователь уже существует.";
+        public const string UserIsAlreadySubstribed = "Пользователь уже подписан на эту группу.";
+        public const string CommunityNotFound = "Такая группа не найдена.";
     }
 }

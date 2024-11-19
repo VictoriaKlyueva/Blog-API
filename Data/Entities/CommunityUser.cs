@@ -8,12 +8,12 @@ namespace BackendLaboratory.Data.Entities
         [Required]
         public Guid UserId { get; set; }
 
-        public required User User { get; set; }
+        public User User { get; set; }
 
         [Required]
         public Guid CommunityId { get; set; }
 
-        public required Community Community { get; set; }
+        public Community Community { get; set; }
 
         [Required]
         public CommunityRole Role { get; set; }
