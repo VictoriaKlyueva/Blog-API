@@ -1,5 +1,6 @@
 ﻿using BackendLaboratory.Data;
 using BackendLaboratory.Data.DTO;
+using BackendLaboratory.Migrations;
 using BackendLaboratory.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,7 +18,13 @@ namespace BackendLaboratory.Repository
 
         public async Task<List<TagDto>> GetTags()
         {
-            return await _db.Tags.ToListAsync();
+            var tags = await _db.Tags.ToListAsync();
+            return tags.Select(tag => new TagDto
+            {
+                Id = tag.Id,
+                CreateTime = tag.CreateTime,
+                Name = tag.Name
+            }).ToList();
         }
     }
 }
