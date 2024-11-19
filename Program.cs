@@ -58,6 +58,7 @@ builder.Services.AddAuthorization(services =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
+builder.Services.AddScoped<ICommunityRepository, CommunityRepository>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IAuthorizationHandler, TokenBlackListPolicy>();
 

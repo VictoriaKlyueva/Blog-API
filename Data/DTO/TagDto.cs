@@ -5,13 +5,13 @@ namespace BackendLaboratory.Data.DTO
     public class TagDto
     {
         [Required]
-        public Guid id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public required DateTime CreateTime { get; set; }
 
         [Required]
         [MinLength(1)]
-        public required string name { get; set; }
+        public required string Name { get; set; }
     }
 }
