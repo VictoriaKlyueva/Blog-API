@@ -6,8 +6,8 @@ namespace BackendLaboratory.Repository.IRepository
     {
         Task<List<CommunityDto>> GetCommunities();
 
-        Task SubstribeToCommunity(string token, string communityId);
+        Task SubscribeToCommunity(string token, string communityId);
 
-        Task UnsubstribeFromCommunity(string token, string communityId);
+        Task UnsubscribeFromCommunity(string token, string communityId);
     }
 }

@@ -12,5 +12,6 @@
         public const string UserIsAlreadyExcist = "Такой пользователь уже существует.";
         public const string UserIsAlreadySubstribed = "Пользователь уже подписан на эту группу.";
         public const string CommunityNotFound = "Такая группа не найдена.";
+        public const string UserIsNotSubstribed = "Пользователь не подписан на эту группу.";
     }
 }

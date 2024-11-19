@@ -39,7 +39,7 @@ namespace BackendLaboratory.Repository
             }).ToList();
         }
 
-        public async Task SubstribeToCommunity(string token, string communityId)
+        public async Task SubscribeToCommunity(string token, string communityId)
         {
             string userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
@@ -59,9 +59,24 @@ namespace BackendLaboratory.Repository
             await _db.SaveChangesAsync();
         }
 
-        public Task UnsubstribeFromCommunity(string token, string communityId)
+        public async Task UnsubscribeFromCommunity(string token, string communityId)
         {
-            throw new NotImplementedException();
+            string userId = _tokenHelper.GetIdFromToken(token);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+            if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            var community = await _db.Communities.FirstOrDefaultAsync(c => c.Id.ToString() == communityId);
+            if (community == null) { throw new NotFoundException(ErrorMessages.CommunityNotFound); }
+
+            var communityUser = await _db.CommunityUsers
+                .FirstOrDefaultAsync(cu => cu.UserId.ToString() == userId && cu.CommunityId.ToString() == communityId);
+            if (communityUser == null)
+            {
+                throw new BadRequestException(ErrorMessages.UserIsNotSubstribed);
+            }
+
+            _db.CommunityUsers.Remove(communityUser);
+            await _db.SaveChangesAsync();
         }
     }
 }

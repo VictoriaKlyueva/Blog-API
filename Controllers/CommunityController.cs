@@ -28,13 +28,23 @@ namespace BackendLaboratory.Controllers
             return Ok(response);
         }
 
-        [HttpPost("{id}/substribe")]
+        [HttpPost("{id}/subscribe")]
         [Authorize(Policy = "TokenBlackListPolicy")]
-        public async Task<IActionResult> SubstribeToCommunity(string id)
+        public async Task<IActionResult> SubscribeToCommunity(string id)
         {
             string token = GetTokenFromHeader();
 
-            await _communityRepository.SubstribeToCommunity(token, id);
+            await _communityRepository.SubscribeToCommunity(token, id);
+            return Ok();
+        }
+
+        [HttpDelete("{id}/unsubscribe")]
+        [Authorize(Policy = "TokenBlackListPolicy")]
+        public async Task<IActionResult> UnubscribeFromCommunity(string id)
+        {
+            string token = GetTokenFromHeader();
+
+            await _communityRepository.UnsubscribeFromCommunity(token, id);
             return Ok();
         }
     }
