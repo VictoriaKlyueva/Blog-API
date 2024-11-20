@@ -3,13 +3,11 @@ using BackendLaboratory.Data;
 using BackendLaboratory.Data.DTO;
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Data.Entities.Enums;
+using BackendLaboratory.Migrations;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System.Data;
-using System.Reflection.Metadata;
 
 namespace BackendLaboratory.Repository
 {
@@ -38,6 +36,28 @@ namespace BackendLaboratory.Repository
                 SubscribersCount = community.SubscribersCount
             }).ToList();
         }
+
+        public async Task<List<CommunityUserDto>> GetUserCommunities(string token)
+        {
+            string userId = _tokenHelper.GetIdFromToken(token);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+            if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            var communityUsers = await _db.CommunityUsers
+                .Where(p => p.UserId.ToString() == userId)
+                .Select(communityUser => new CommunityUserDto
+                {
+                    UserId = communityUser.UserId,
+                    CommunityId = communityUser.CommunityId,
+                    Role = communityUser.Role
+                })
+                .ToListAsync();
+
+            if (communityUsers.Count == 0) { throw new NotFoundException(ErrorMessages.CommunitiesNotFound); }
+
+            return communityUsers;
+        }
+
 
         public async Task SubscribeToCommunity(string token, string communityId)
         {

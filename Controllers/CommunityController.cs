@@ -28,6 +28,16 @@ namespace BackendLaboratory.Controllers
             return Ok(response);
         }
 
+        [HttpGet("my")]
+        [Authorize(Policy = "TokenBlackListPolicy")]
+        public async Task<IActionResult> GetUserCommunities()
+        {
+            string token = GetTokenFromHeader();
+
+            var response = await _communityRepository.GetUserCommunities(token);
+            return Ok(response);
+        }
+
         [HttpPost("{id}/subscribe")]
         [Authorize(Policy = "TokenBlackListPolicy")]
         public async Task<IActionResult> SubscribeToCommunity(string id)
