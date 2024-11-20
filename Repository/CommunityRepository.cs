@@ -94,6 +94,33 @@ namespace BackendLaboratory.Repository
             return communityInfo;
         }
 
+        public async Task<CommunityRole?> GetCommunityRole(string token, string communityId)
+        {
+            string userId = _tokenHelper.GetIdFromToken(token);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+            if (user == null)
+            { 
+                throw new UnauthorizedException(ErrorMessages.ProfileNotFound); 
+            }
+
+            var community = await _db.Communities.FirstOrDefaultAsync(c => c.Id.ToString() == communityId);
+            if (community == null)
+            {
+                throw new NotFoundException(ErrorMessages.CommunityNotFound);
+            }
+
+            var communityUser = await _db.CommunityUsers
+                .FirstOrDefaultAsync(cu => 
+                    cu.UserId.ToString() == userId && 
+                    cu.CommunityId.ToString() == communityId
+                );
+            if (communityUser == null)
+            { 
+                return null;
+            }
+            
+            return communityUser.Role;
+        }
 
         public async Task SubscribeToCommunity(string token, string communityId)
         {

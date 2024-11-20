@@ -45,6 +45,16 @@ namespace BackendLaboratory.Controllers
             return Ok(response);
         }
 
+        [HttpGet("{id}/role")]
+        [Authorize(Policy = "TokenBlackListPolicy")]
+        public async Task<IActionResult> GetCommunityRole(string id)
+        {
+            string token = GetTokenFromHeader();
+
+            var response = await _communityRepository.GetCommunityRole(token, id);
+            return Ok(response);
+        }
+
         [HttpPost("{id}/subscribe")]
         [Authorize(Policy = "TokenBlackListPolicy")]
         public async Task<IActionResult> SubscribeToCommunity(string id)
