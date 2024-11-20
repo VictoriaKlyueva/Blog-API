@@ -22,7 +22,7 @@ namespace BackendLaboratory.Controllers
         }
 
         [HttpGet(AppConstants.EmptyString)]
-        public async Task<IActionResult> GetCommunities() 
+        public async Task<IActionResult> GetCommunities()
         {
             var response = await _communityRepository.GetCommunities();
             return Ok(response);
@@ -35,6 +35,13 @@ namespace BackendLaboratory.Controllers
             string token = GetTokenFromHeader();
 
             var response = await _communityRepository.GetUserCommunities(token);
+            return Ok(response);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCommunityInfo(string id)
+        {
+            var response = await _communityRepository.GetCommunityInfo(id);
             return Ok(response);
         }
 

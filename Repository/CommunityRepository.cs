@@ -58,6 +58,42 @@ namespace BackendLaboratory.Repository
             return communityUsers;
         }
 
+        public async Task<CommunityFullDto> GetCommunityInfo(string communityId)
+        {
+            var community = await _db.Communities.FirstOrDefaultAsync(c => c.Id.ToString() == communityId);
+            if (community == null)
+            {
+                throw new NotFoundException(ErrorMessages.CommunityNotFound);
+            }
+
+            var administrators = await _db.CommunityUsers
+                .Where(p => p.CommunityId == community.Id && p.Role == CommunityRole.Administrator)
+                .Include(cu => cu.User)
+                .ToListAsync();
+
+            var communityInfo = new CommunityFullDto
+            {
+                Id = community.Id,
+                CreateTime = community.CreateTime,
+                Name = community.Name,
+                Description = community.Description,
+                IsClosed = community.IsClosed,
+                SubscribersCount = community.SubscribersCount,
+                Administrators = administrators.Select(cu => new UserDto
+                {
+                    Id = cu.User.Id,
+                    CreateTime = cu.User.CreateTime,
+                    FullName = cu.User.FullName,
+                    BirthDate = cu.User.BirthDate,
+                    Gender = cu.User.Gender,
+                    Email = cu.User.Email,
+                    PhoneNumber = cu.User.PhoneNumber
+                }).ToList()
+            };
+
+            return communityInfo;
+        }
+
 
         public async Task SubscribeToCommunity(string token, string communityId)
         {

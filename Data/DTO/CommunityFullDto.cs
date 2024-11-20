@@ -12,9 +12,9 @@ namespace BackendLaboratory.Data.DTO
 
         [Required]
         [MinLength(1)]
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
-        public string Description { get; set; }
+        public required string Description { get; set; }
 
         [Required]
         public bool IsClosed { get; set; } = false;

@@ -11,5 +11,7 @@ namespace BackendLaboratory.Repository.IRepository
         Task SubscribeToCommunity(string token, string communityId);
 
         Task UnsubscribeFromCommunity(string token, string communityId);
+
+        Task<CommunityFullDto> GetCommunityInfo(string communityId);
     }
 }
