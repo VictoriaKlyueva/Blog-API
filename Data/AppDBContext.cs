@@ -14,6 +14,7 @@ namespace BackendLaboratory.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Community> Communities { get; set; }
+        public DbSet<Post> Posts { get; set; }
         public DbSet<CommunityUser> CommunityUsers { get; set; }
         public DbSet<BlackToken> BlackTokens { get; set; }
         public DbSet<Tag> Tags { get; set; }
