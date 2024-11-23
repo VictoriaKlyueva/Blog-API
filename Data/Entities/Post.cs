@@ -40,9 +40,7 @@ namespace BackendLaboratory.Data.Entities
         [Range(0, int.MaxValue, ErrorMessage = ErrorMessages.ValueMustBePositive)]
         public int CommentsCount { get; set; } = 0;
 
-        public required List<Guid> Tags { get; set; }
-
-        public List<Comment> Comments { get; set; } = new List<Comment>();
+        public List<Tag> Tags { get; set; } = new List<Tag>();
 
         public List<User> Users { get; set; } = new List<User>();
 

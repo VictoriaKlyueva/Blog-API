@@ -1,12 +1,11 @@
 ﻿using BackendLaboratory.Constants;
 using BackendLaboratory.Data;
 using BackendLaboratory.Data.DTO;
-using BackendLaboratory.Migrations;
+using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace BackendLaboratory.Repository
 {
@@ -27,21 +26,22 @@ namespace BackendLaboratory.Repository
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 
-            //PostDto post = new()
-            //{
-            //    Id = Guid.NewGuid(),
-            //    CreateTime = DateTime.Now,
-            //    Title = createPostDto.Title,
-            //    Description = createPostDto.Description,
-            //    ReadingTime = createPostDto.ReadingTime,
-            //    Image = createPostDto.Image,
-            //    AuthorId = new Guid(userId),
-            //    CommunityId = null,
-            //    AddressId = null, // Исправить на адрес
-            //    Likes = 0,
-            //    CommentsCount = 0,
-            //    Tags = createPostDto.Tags
-            //};
+            Post post = new()
+            {
+                Id = Guid.NewGuid(),
+                CreateTime = DateTime.Now,
+                Title = createPostDto.Title,
+                Description = createPostDto.Description,
+                ReadingTime = createPostDto.ReadingTime,
+                Image = createPostDto.Image,
+                AuthorId = new Guid(userId),
+                CommunityId = null,
+                AddressId = null, // Исправить на адрес
+                Likes = 0,
+                CommentsCount = 0
+            };
+
+            _db.Posts.Add(post);
 
             await _db.SaveChangesAsync();
         }

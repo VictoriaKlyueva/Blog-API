@@ -16,9 +16,9 @@ namespace BackendLaboratory.Data
         public DbSet<Community> Communities { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Like> LikesLink { get; set; }
-        public DbSet<CommunityUser> CommunityUsers { get; set; }
         public DbSet<BlackToken> BlackTokens { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<CommunityUser> CommunityUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
