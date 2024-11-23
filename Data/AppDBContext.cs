@@ -15,6 +15,7 @@ namespace BackendLaboratory.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Community> Communities { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Like> LikesLink { get; set; }
         public DbSet<CommunityUser> CommunityUsers { get; set; }
         public DbSet<BlackToken> BlackTokens { get; set; }
         public DbSet<Tag> Tags { get; set; }
@@ -38,6 +39,25 @@ namespace BackendLaboratory.Data
                 {
                     j.HasKey(t => new { t.CommunityId, t.UserId });
                     j.ToTable("CommunityUsers");
+                });
+
+            modelBuilder
+                .Entity<Post>()
+                .HasMany(c => c.Users)
+                .WithMany(s => s.Posts)
+                .UsingEntity<Like>(
+                   j => j
+                    .HasOne(pt => pt.User)
+                    .WithMany(t => t.LikesLink)
+                    .HasForeignKey(pt => pt.UserId),
+                j => j
+                    .HasOne(pt => pt.Post)
+                    .WithMany(p => p.LikesLink)
+                    .HasForeignKey(pt => pt.PostId),
+                j =>
+                {
+                    j.HasKey(t => new { t.PostId, t.UserId });
+                    j.ToTable("Likes");
                 });
 
             AddAdminData(modelBuilder);

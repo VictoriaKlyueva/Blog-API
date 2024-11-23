@@ -21,6 +21,6 @@ namespace BackendLaboratory.Data.DTO
         public string? Image { get; set; }
 
         [Required]
-        public List<string> Tags { get; set; } = new List<string>();
+        public List<Guid> Tags { get; set; } = new List<Guid>();
     }
 }

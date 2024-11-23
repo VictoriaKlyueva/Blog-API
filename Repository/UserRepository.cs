@@ -109,7 +109,7 @@ namespace BackendLaboratory.Repository
                 Email = userRegisterModel.Email,
                 BirthDate = userRegisterModel.BirthDate,
                 Gender = userRegisterModel.Gender,
-                PhoneNumber = userRegisterModel.PhoneNumber,
+                PhoneNumber = userRegisterModel.PhoneNumber
             };
 
             _db.Users.Add(user);

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using BackendLaboratory.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BackendLaboratory.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241123170350_DeletedFieldsFromPost")]
+    partial class DeletedFieldsFromPost
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,21 +163,6 @@ namespace BackendLaboratory.Migrations
                     b.ToTable("CommunityUsers", (string)null);
                 });
 
-            modelBuilder.Entity("BackendLaboratory.Data.Entities.Like", b =>
-                {
-                    b.Property<Guid>("PostId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("PostId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Likes", (string)null);
-                });
-
             modelBuilder.Entity("BackendLaboratory.Data.Entities.Post", b =>
                 {
                     b.Property<Guid>("Id")
@@ -217,7 +205,12 @@ namespace BackendLaboratory.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Posts");
                 });
@@ -326,6 +319,10 @@ namespace BackendLaboratory.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
+                    b.Property<List<Guid>>("Likes")
+                        .IsRequired()
+                        .HasColumnType("uuid[]");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
@@ -370,23 +367,11 @@ namespace BackendLaboratory.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BackendLaboratory.Data.Entities.Like", b =>
+            modelBuilder.Entity("BackendLaboratory.Data.Entities.Post", b =>
                 {
-                    b.HasOne("BackendLaboratory.Data.Entities.Post", "Post")
-                        .WithMany("LikesLink")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BackendLaboratory.Data.Entities.User", "User")
-                        .WithMany("LikesLink")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Post");
-
-                    b.Navigation("User");
+                    b.HasOne("BackendLaboratory.Data.Entities.User", null)
+                        .WithMany("Posts")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("BackendLaboratory.Data.Entities.Comment", b =>
@@ -402,15 +387,13 @@ namespace BackendLaboratory.Migrations
             modelBuilder.Entity("BackendLaboratory.Data.Entities.Post", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("LikesLink");
                 });
 
             modelBuilder.Entity("BackendLaboratory.Data.Entities.User", b =>
                 {
                     b.Navigation("CommunityUsers");
 
-                    b.Navigation("LikesLink");
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }
