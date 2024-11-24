@@ -25,7 +25,7 @@ namespace BackendLaboratory.Repository
                     BirthDate = user.BirthDate,
                     gender = user.Gender,
                     Posts = _db.Posts.Where(post => post.AuthorId == user.Id).Count(),
-                    Likes = user.Posts
+                    Likes = _db.Posts
                         .Where(post => user.Id == post.AuthorId)
                         .Sum(post => post.Likes),
                     Created = user.CreateTime

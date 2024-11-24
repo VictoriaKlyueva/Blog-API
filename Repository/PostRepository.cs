@@ -212,6 +212,8 @@ namespace BackendLaboratory.Repository
             user.LikesLink.Add(new Like { 
                 Post = post
             });
+            post.Likes += 1;
+
             await _db.SaveChangesAsync();
         }
 
@@ -261,6 +263,8 @@ namespace BackendLaboratory.Repository
             }
 
             user.LikesLink.Remove(like);
+            post.Likes -= 1;
+
             await _db.SaveChangesAsync();
         }
     }
