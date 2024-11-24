@@ -21,7 +21,6 @@ namespace BackendLaboratory.Util.Token
                 if (!string.IsNullOrEmpty(authorizationHeader) && authorizationHeader.StartsWith("Bearer "))
                 {
                     var token = authorizationHeader.Substring("Bearer ".Length);
-                    Console.WriteLine(token);
                     var blackToken = appDbContext.BlackTokens.FirstOrDefault(b => b.Blacktoken == token);
 
                     if (blackToken != null)

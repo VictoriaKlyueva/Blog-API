@@ -20,10 +20,8 @@ namespace BackendLaboratory.Repository
             _tokenHelper = new TokenHelper(configuration);
         }
 
-        public async Task<Post> CreatePost(string token, CreatePostDto createPostDto)
+        public async Task CreatePost(string token, CreatePostDto createPostDto)
         {
-            Console.WriteLine("Успех!");
-
             string userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
@@ -31,7 +29,7 @@ namespace BackendLaboratory.Repository
             Post post = new()
             {
                 Id = Guid.NewGuid(),
-                CreateTime = DateTime.Now,
+                CreateTime = DateTime.UtcNow,
                 Title = createPostDto.Title,
                 Description = createPostDto.Description,
                 ReadingTime = createPostDto.ReadingTime,
@@ -51,15 +49,18 @@ namespace BackendLaboratory.Repository
                 foreach (var tagId in createPostDto.Tags.Distinct())
                 {
                     var tag = await _db.Tags.FirstOrDefaultAsync(t => t.Id == tagId);
+
+                    Console.WriteLine("dkjfvbdhkbg");
+
                     if (tag == null) { throw new NotFoundException(ErrorMessages.TagNotFound); }
+
+                    Console.WriteLine("3838754873");
 
                     post.Tags.Add(tag);
                 }
 
                 await _db.SaveChangesAsync();
             }
-
-            return post;
         }
     }
 }

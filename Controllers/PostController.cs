@@ -29,8 +29,8 @@ namespace BackendLaboratory.Controllers
         {
             string token = GetTokenFromHeader();
 
-            var responce = await _postRepository.CreatePost(token, model);
-            return Ok(responce);
+            await _postRepository.CreatePost(token, model);
+            return Ok();
         }
     }
 }
