@@ -20,5 +20,7 @@
         public const string ValueMustBePositive = "Значение должно быть больше 0";
         public const string UserCantMakePost = "Этот пользователь не может создавать посты в этой группе.";
         public const string PostForbidden = "Пост недоступен этому пользователю.";
+        public const string LikeIsAlreadyAdded = "Пользователь уже поставил лайк на этот пост.";
+        public const string LikeHasntBeenAdded = "У пользователя нет лайка на этот пост.";
     }
 }

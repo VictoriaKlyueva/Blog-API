@@ -42,5 +42,25 @@ namespace BackendLaboratory.Controllers
             var responce = await _postRepository.GetPostInfo(token, id);
             return Ok(responce);
         }
+
+        [HttpPost("{postId}/like")]
+        [Authorize(Policy = "TokenBlackListPolicy")]
+        public async Task<IActionResult> AddLike(string postId)
+        {
+            string token = GetTokenFromHeader();
+
+            await _postRepository.AddLike(token, postId);
+            return Ok();
+        }
+
+        [HttpDelete("{postId}/like")]
+        [Authorize(Policy = "TokenBlackListPolicy")]
+        public async Task<IActionResult> DeleteLike(string postId)
+        {
+            string token = GetTokenFromHeader();
+
+            await _postRepository.DeleteLike(token, postId);
+            return Ok();
+        }
     }
 }

@@ -163,5 +163,105 @@ namespace BackendLaboratory.Repository
 
             return postFullDto;
         }
+
+        public async Task AddLike(string token, string postId)
+        {
+            string userId = _tokenHelper.GetIdFromToken(token);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+            if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            var post = await _db.Posts.FirstOrDefaultAsync(c => c.Id.ToString() == postId);
+            if (post == null)
+            {
+                throw new NotFoundException(ErrorMessages.CommunityNotFound);
+            }
+
+            // Проверка на доступ
+            if (post.CommunityId != null)
+            {
+                var community = await _db.Communities
+                    .FirstOrDefaultAsync(c => c.Id == post.CommunityId);
+                if (community == null) { throw new NotFoundException(ErrorMessages.CommunityNotFound); }
+
+                // Если сообщество закрытое, то пользователь должен быть подписан
+                if (community.IsClosed)
+                {
+                    var communityUser = await _db.CommunityUsers
+                        .FirstOrDefaultAsync(
+                            cu => cu.UserId.ToString() == userId &&
+                            cu.CommunityId == community.Id
+                        );
+
+                    if (communityUser == null)
+                    {
+                        throw new ForbiddenException(ErrorMessages.PostForbidden);
+                    }
+                }
+            }
+
+            var existingLike = await _db.LikesLink
+                .FirstOrDefaultAsync(
+                    cu => cu.UserId.ToString() == userId && 
+                    cu.PostId.ToString() == postId
+                );
+            if (existingLike != null)
+            {
+                throw new BadRequestException(ErrorMessages.LikeIsAlreadyAdded);
+            }
+
+            user.LikesLink.Add(new Like { 
+                Post = post
+            });
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task DeleteLike(string token, string postId)
+        {
+            string userId = _tokenHelper.GetIdFromToken(token);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+            if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            var post = await _db.Posts.FirstOrDefaultAsync(c => c.Id.ToString() == postId);
+            if (post == null)
+            {
+                throw new NotFoundException(ErrorMessages.CommunityNotFound);
+            }
+
+            // Проверка на доступ
+            if (post.CommunityId != null)
+            {
+                var community = await _db.Communities
+                    .FirstOrDefaultAsync(c => c.Id == post.CommunityId);
+                if (community == null) { throw new NotFoundException(ErrorMessages.CommunityNotFound); }
+
+                // Если сообщество закрытое, то пользователь должен быть подписан
+                if (community.IsClosed)
+                {
+                    var communityUser = await _db.CommunityUsers
+                        .FirstOrDefaultAsync(
+                            cu => cu.UserId.ToString() == userId &&
+                            cu.CommunityId == community.Id
+                        );
+
+                    if (communityUser == null)
+                    {
+                        throw new ForbiddenException(ErrorMessages.PostForbidden);
+                    }
+                }
+            }
+
+            var like = await _db.LikesLink
+                .FirstOrDefaultAsync(
+                    cu => cu.UserId.ToString() == userId &&
+                    cu.PostId.ToString() == postId
+                );
+            if (like == null)
+            {
+                throw new BadRequestException(ErrorMessages.LikeHasntBeenAdded);
+            }
+
+            user.LikesLink.Remove(like);
+            await _db.SaveChangesAsync();
+        }
     }
 }
