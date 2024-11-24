@@ -56,7 +56,11 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddAuthorization(services =>
 {
-    services.AddPolicy("TokenBlackListPolicy", policy => policy.Requirements.Add(new TokenBlackListRequirment()));
+    services.AddPolicy(
+        "TokenBlackListPolicy", 
+        policy => 
+            policy.Requirements.Add(new TokenBlackListRequirment())
+    );
 });
 
 builder.Services.AddControllersWithViews();
@@ -64,6 +68,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<ICommunityRepository, CommunityRepository>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IAuthorizationHandler, TokenBlackListPolicy>();
 
@@ -114,7 +119,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // Configure custom middlewares
-app.UseMiddleware<ExceptionMiddleware>();
+// app.UseMiddleware<ExceptionMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
