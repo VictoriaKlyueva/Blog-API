@@ -122,6 +122,71 @@ namespace BackendLaboratory.Repository
             return communityUser.Role;
         }
 
+        public async Task CreateCommunityPost(string token, string communityId, CreatePostDto createPostDto)
+        {
+            // Check authorization
+            string userId = _tokenHelper.GetIdFromToken(token);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+            if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            // Check is community found
+            var community = await _db.Communities.FirstOrDefaultAsync(c => c.Id.ToString() == communityId);
+            if (community == null) { throw new NotFoundException(ErrorMessages.CommunityNotFound); }
+
+            // Check user can make post
+            var communityUser = await _db.CommunityUsers
+                .FirstOrDefaultAsync(cu => cu.UserId.ToString() == userId && cu.CommunityId.ToString() == communityId);
+            if (communityUser == null)
+            {
+                throw new ForbiddenException(ErrorMessages.UserIsNotSubstribed);
+            }
+            if (communityUser.Role == CommunityRole.Substriber)
+            {
+                throw new ForbiddenException(ErrorMessages.UserCantMakePost);
+            }
+
+            // Check tags
+            if (createPostDto.Tags != null && createPostDto.Tags.Any())
+            {
+                foreach (var tagId in createPostDto.Tags.Distinct())
+                {
+                    var tag = await _db.Tags.FirstOrDefaultAsync(t => t.Id == tagId);
+                    if (tag == null) { throw new NotFoundException(ErrorMessages.TagNotFound); }
+                }
+            }
+
+            Data.Entities.Post post = new()
+            {
+                Id = Guid.NewGuid(),
+                CreateTime = DateTime.UtcNow,
+                Title = createPostDto.Title,
+                Description = createPostDto.Description,
+                ReadingTime = createPostDto.ReadingTime,
+                Image = createPostDto.Image,
+                AuthorId = new Guid(userId),
+                CommunityId = new Guid(communityId),
+                AddressId = null, // Исправить на адрес
+                Likes = 0,
+                CommentsCount = 0
+            };
+
+            _db.Posts.Add(post);
+            await _db.SaveChangesAsync();
+
+            if (createPostDto.Tags != null && createPostDto.Tags.Any())
+            {
+                foreach (var tagId in createPostDto.Tags.Distinct())
+                {
+                    var tag = await _db.Tags.FirstOrDefaultAsync(t => t.Id == tagId);
+                    if (tag == null) { throw new NotFoundException(ErrorMessages.TagNotFound); }
+
+                    post.Tags.Add(tag);
+                }
+
+                await _db.SaveChangesAsync();
+            }
+        }
+
         public async Task SubscribeToCommunity(string token, string communityId)
         {
             string userId = _tokenHelper.GetIdFromToken(token);

@@ -1,4 +1,5 @@
-﻿using BackendLaboratory.Repository;
+﻿using BackendLaboratory.Data.DTO;
+using BackendLaboratory.Repository;
 using BackendLaboratory.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -53,6 +54,16 @@ namespace BackendLaboratory.Controllers
 
             var response = await _communityRepository.GetCommunityRole(token, id);
             return Ok(response);
+        }
+
+        [HttpPost("{id}/post")]
+        [Authorize(Policy = "TokenBlackListPolicy")]
+        public async Task<IActionResult> CreateCommunityPost([FromBody] CreatePostDto createPostDto, string id)
+        {
+            string token = GetTokenFromHeader();
+
+            await _communityRepository.CreateCommunityPost(token, id, createPostDto);
+            return Ok();
         }
 
         [HttpPost("{id}/subscribe")]

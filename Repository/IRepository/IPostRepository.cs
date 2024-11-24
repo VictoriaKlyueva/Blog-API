@@ -6,5 +6,9 @@ namespace BackendLaboratory.Repository.IRepository
     public interface IPostRepository
     {
         Task CreatePost(string token, CreatePostDto createPostDto);
+
+        Task CreateCommunityPost(string token, CreatePostDto createPostDto);
+
+        Task<PostFullDto> GetPostInfo();
     }
 }

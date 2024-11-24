@@ -12,8 +12,11 @@ namespace BackendLaboratory.Repository.IRepository
 
         Task<CommunityRole?> GetCommunityRole(string token, string communityId);
 
+        Task CreateCommunityPost(string token, string communityId, CreatePostDto createPostDto);
+
         Task SubscribeToCommunity(string token, string communityId);
 
         Task UnsubscribeFromCommunity(string token, string communityId);
+
     }
 }

@@ -20,11 +20,25 @@ namespace BackendLaboratory.Repository
             _tokenHelper = new TokenHelper(configuration);
         }
 
+        public Task CreateCommunityPost(string token, CreatePostDto createPostDto)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task CreatePost(string token, CreatePostDto createPostDto)
         {
             string userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            if (createPostDto.Tags != null && createPostDto.Tags.Any())
+            {
+                foreach (var tagId in createPostDto.Tags.Distinct())
+                {
+                    var tag = await _db.Tags.FirstOrDefaultAsync(t => t.Id == tagId);
+                    if (tag == null) { throw new NotFoundException(ErrorMessages.TagNotFound); }
+                }
+            }
 
             Post post = new()
             {
@@ -49,18 +63,18 @@ namespace BackendLaboratory.Repository
                 foreach (var tagId in createPostDto.Tags.Distinct())
                 {
                     var tag = await _db.Tags.FirstOrDefaultAsync(t => t.Id == tagId);
-
-                    Console.WriteLine("dkjfvbdhkbg");
-
                     if (tag == null) { throw new NotFoundException(ErrorMessages.TagNotFound); }
-
-                    Console.WriteLine("3838754873");
 
                     post.Tags.Add(tag);
                 }
 
                 await _db.SaveChangesAsync();
             }
+        }
+
+        public Task<PostFullDto> GetPostInfo()
+        {
+            throw new NotImplementedException();
         }
     }
 }
