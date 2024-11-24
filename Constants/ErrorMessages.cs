@@ -14,8 +14,11 @@
         public const string CommunityNotFound = "Такая группа не найдена.";
         public const string CommunitiesNotFound = "Группы не найдены.";
         public const string TagNotFound = "Тэг не существует.";
+        public const string PostNotFound = "Пост не существует.";
+        public const string AuthorNotFound = "Автор поста не найден";
         public const string UserIsNotSubstribed = "Пользователь не подписан на эту группу.";
         public const string ValueMustBePositive = "Значение должно быть больше 0";
         public const string UserCantMakePost = "Этот пользователь не может создавать посты в этой группе.";
+        public const string PostForbidden = "Пост недоступен этому пользователю.";
     }
 }

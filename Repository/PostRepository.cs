@@ -2,6 +2,7 @@
 using BackendLaboratory.Data;
 using BackendLaboratory.Data.DTO;
 using BackendLaboratory.Data.Entities;
+using BackendLaboratory.Data.Entities.Enums;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
@@ -72,9 +73,95 @@ namespace BackendLaboratory.Repository
             }
         }
 
-        public Task<PostFullDto> GetPostInfo()
+        public async Task<PostFullDto> GetPostInfo(string token, string postId)
         {
-            throw new NotImplementedException();
+            string userId = _tokenHelper.GetIdFromToken(token);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+            if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            var post = await _db.Posts.FirstOrDefaultAsync(c => c.Id.ToString() == postId);
+            if (post == null) { throw new NotFoundException(ErrorMessages.CommunityNotFound); }
+
+            // Проверка на доступ
+            if (post.CommunityId != null)
+            {
+                var community = await _db.Communities
+                    .FirstOrDefaultAsync(c => c.Id == post.CommunityId);
+                if (community == null) { throw new NotFoundException(ErrorMessages.CommunityNotFound); }
+
+                // Если сообщество закрытое, то пользователь должен быть подписан
+                if (community.IsClosed)
+                {
+                    var communityUser = await _db.CommunityUsers
+                        .FirstOrDefaultAsync(
+                            cu => cu.UserId.ToString() == userId && 
+                            cu.CommunityId == community.Id
+                        );
+
+                    if (communityUser == null)
+                    {
+                        throw new ForbiddenException(ErrorMessages.PostForbidden);
+                    }
+                }
+            }
+
+            PostFullDto postFullDto = new()
+            {
+                Id = post.Id,
+                CreateTime = post.CreateTime,
+                Title = post.Title,
+                Description = post.Description,
+                ReadingTime = post.ReadingTime,
+                Image = post.Image,
+                AuthorId = post.AuthorId,
+                Author = AppConstants.EmptyString,
+                CommunityId = post.CommunityId,
+                CommunityName = null,
+                AddressId = post.AddressId,
+                Likes = post.Likes,
+                HasLike = false,
+                CommentsCount = post.CommentsCount,
+                Tags = new List<TagDto>(),
+                Comments = new List<CommentDto>() // Заменить на комментарии
+            };
+
+            var author = await _db.Users.FirstOrDefaultAsync(a => a.Id == post.AuthorId);
+            if (author == null) { throw new NotFoundException(ErrorMessages.AuthorNotFound); }
+            postFullDto.Author = author.FullName;
+
+            if (post.CommunityId != null)
+            {
+                var community = await _db.Communities.FirstOrDefaultAsync(c => c.Id == post.CommunityId);
+                if (community == null) { throw new NotFoundException(ErrorMessages.CommunityNotFound); }
+                postFullDto.CommunityName = community.Name;
+            }
+
+            var likeLink = await _db.LikesLink
+                .FirstOrDefaultAsync(
+                    cu => cu.UserId.ToString() == userId && 
+                    cu.PostId == post.Id
+                );
+            if (likeLink != null)
+            {
+                postFullDto.HasLike = true;
+            }
+
+            var postTags = await _db.PostTags
+                .Where(pt => pt.PostId == post.Id)
+                .Include(pt => pt.Tag)
+                .ToListAsync();
+
+            if (postTags != null)
+            {
+                postFullDto.Tags = postTags.Select(pt => new TagDto
+                {
+                    Id = pt.Tag.Id,
+                    CreateTime = pt.Tag.CreateTime,
+                    Name = pt.Tag.Name
+                }).ToList();
+            }
+
+            return postFullDto;
         }
     }
 }

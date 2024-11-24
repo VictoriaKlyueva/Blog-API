@@ -32,5 +32,15 @@ namespace BackendLaboratory.Controllers
             await _postRepository.CreatePost(token, model);
             return Ok();
         }
+
+        [HttpGet("{id}")]
+        [Authorize(Policy = "TokenBlackListPolicy")]
+        public async Task<IActionResult> GetPostInfo(string id)
+        {
+            string token = GetTokenFromHeader();
+
+            var responce = await _postRepository.GetPostInfo(token, id);
+            return Ok(responce);
+        }
     }
 }

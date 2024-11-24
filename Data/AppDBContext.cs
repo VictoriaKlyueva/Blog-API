@@ -1,7 +1,5 @@
-﻿using BackendLaboratory.Data.DTO;
-using BackendLaboratory.Data.Entities;
+﻿using BackendLaboratory.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace BackendLaboratory.Data
 {
@@ -15,10 +13,11 @@ namespace BackendLaboratory.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Community> Communities { get; set; }
         public DbSet<Post> Posts { get; set; }
-        public DbSet<Like> LikesLink { get; set; }
         public DbSet<BlackToken> BlackTokens { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<CommunityUser> CommunityUsers { get; set; }
+        public DbSet<PostTag> PostTags { get; set; }
+        public DbSet<Like> LikesLink { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,12 +59,37 @@ namespace BackendLaboratory.Data
                     j.ToTable("Likes");
                 });
 
+            modelBuilder
+                .Entity<Post>()
+                .HasMany(c => c.Tags)
+                .WithMany(s => s.Posts)
+                .UsingEntity<PostTag>(
+                   j => j
+                    .HasOne(pt => pt.Tag)
+                    .WithMany(t => t.PostTags)
+                    .HasForeignKey(pt => pt.TagId),
+                j => j
+                    .HasOne(pt => pt.Post)
+                    .WithMany(p => p.PostTags)
+                    .HasForeignKey(pt => pt.PostId),
+                j =>
+                {
+                    j.HasKey(t => new { t.PostId, t.TagId });
+                    j.ToTable("PostTags");
+                });
+
             AddAdminData(modelBuilder);
         }
 
         private void AddAdminData(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Tag>().HasData(
+                new Tag
+                {
+                    Name = "задор",
+                    Id = Guid.Parse("7dd1e51a-606f-4dea-e6e3-08dbea521a91"),
+                    CreateTime = DateTime.UtcNow
+                },
                 new Tag { 
                     Name = "история", 
                     Id = Guid.Parse("7dd0e51a-606f-4dea-e6e3-08dbea521a91"), 

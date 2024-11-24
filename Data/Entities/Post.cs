@@ -42,6 +42,8 @@ namespace BackendLaboratory.Data.Entities
 
         public List<Tag> Tags { get; set; } = new List<Tag>();
 
+        public List<PostTag> PostTags {  get; set; } = new List<PostTag>();
+
         public List<User> Users { get; set; } = new List<User>();
 
         public List<Like> LikesLink { get; set; } = new List<Like>();

@@ -23,7 +23,7 @@ namespace BackendLaboratory.Data.DTO
         [Required]
         public int ReadingTime { get; set; }
 
-        public required string Image { get; set; }
+        public string? Image { get; set; }
 
         [Required]
         public Guid AuthorId { get; set; }
@@ -32,9 +32,9 @@ namespace BackendLaboratory.Data.DTO
         [MinLength(1)]
         public required string Author { get; set; }
 
-        public required string CommunityId { get; set; }
-        public required string CommunityName { get; set; }
-        public required string AddressId { get; set; }
+        public Guid? CommunityId { get; set; }
+        public string? CommunityName { get; set; }
+        public Guid? AddressId { get; set; }
 
         [Required]
         [Range(0, int.MaxValue, ErrorMessage = ErrorMessages.ValueMustBePositive)]
@@ -47,8 +47,8 @@ namespace BackendLaboratory.Data.DTO
         [Range(0, int.MaxValue, ErrorMessage = ErrorMessages.ValueMustBePositive)]
         public int CommentsCount { get; set; } = 0;
 
-        public required List<Guid> Tags { get; set; }
+        public required List<TagDto> Tags { get; set; }
 
-        public required List<Comment> Comments { get; set; }
+        public required List<CommentDto> Comments { get; set; }
     }
 }

@@ -9,6 +9,6 @@ namespace BackendLaboratory.Repository.IRepository
 
         Task CreateCommunityPost(string token, CreatePostDto createPostDto);
 
-        Task<PostFullDto> GetPostInfo();
+        Task<PostFullDto> GetPostInfo(string token, string postId);
     }
 }
