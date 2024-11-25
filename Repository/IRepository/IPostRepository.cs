@@ -1,13 +1,15 @@
 ﻿using BackendLaboratory.Data.DTO;
-using BackendLaboratory.Data.Entities;
+using BackendLaboratory.Data.Entities.Enums;
 
 namespace BackendLaboratory.Repository.IRepository
 {
     public interface IPostRepository
     {
-        Task CreatePost(string token, CreatePostDto createPostDto);
+        Task<PostPagedListDto> GetPosts(List<Guid>? tags, string? author, int? min, 
+            int? max, PostSorting? sorting, bool onlyMyCommunities, 
+            int page, int size, string token);
 
-        Task CreateCommunityPost(string token, CreatePostDto createPostDto);
+        Task CreatePost(string token, CreatePostDto createPostDto);
 
         Task<PostFullDto> GetPostInfo(string token, string postId);
 

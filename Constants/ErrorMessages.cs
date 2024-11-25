@@ -2,11 +2,20 @@
 {
     public static class ErrorMessages
     {
+        // Register data
         public const string InvalidEmail = "Неверный формат почты.";
         public const string InvalidBirthDate = "Неверная дата. Дата должна быть позднее 1915 года и не позднее текущей даты.";
         public const string InvalidFullName = "Неверная имя пользователя. Имя пользователя должно быть записано в формате <Фамилия Имя Отчество>, отчество может отсутствовать.";
         public const string WeakPassword = "Слабый пароль. Сильный пароль должен иметь как минимум одну заглавную букву, одну строчную букву, одну цифру, один специальный символ.";
         public const string InvalidPhoneNumber = "Неверный формат номера телефона. Телефон должен соответствовать маске +7 (xxx) xxx-xx-xx.";
+
+        // Pagination data
+        public const string InvalidSize = "На странице не может быть меньше 1-го элемента.";
+        public const string InvalidPage = "Должна быть хотя бы одна страница.";
+        public const string InvalidMin = "Минимум времени должен быть больше нуля.";
+        public const string InvalidMax = "Максимум времени должен быть больше нуля.";
+
+        // Other
         public const string IncorrectId = "Некорректный ID: не удалось извлечь или преобразовать id из токена.";
         public const string ProfileNotFound = "Пользователь не авторизован.";
         public const string UserIsAlreadyExcist = "Такой пользователь уже существует.";
@@ -22,5 +31,10 @@
         public const string PostForbidden = "Пост недоступен этому пользователю.";
         public const string LikeIsAlreadyAdded = "Пользователь уже поставил лайк на этот пост.";
         public const string LikeHasntBeenAdded = "У пользователя нет лайка на этот пост.";
+
+        public static string ConcreteTagNotFound(string tag)
+        {
+            return $"Tag with id {tag} not found";
+        }
     }
 }

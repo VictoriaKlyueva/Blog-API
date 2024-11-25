@@ -6,7 +6,10 @@ using BackendLaboratory.Data.Entities.Enums;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
+using BackendLaboratory.Util.Validators;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BackendLaboratory.Repository
 {
@@ -21,9 +24,91 @@ namespace BackendLaboratory.Repository
             _tokenHelper = new TokenHelper(configuration);
         }
 
-        public Task CreateCommunityPost(string token, CreatePostDto createPostDto)
+        public async Task<PostPagedListDto> GetPosts(List<Guid>? tags, string? author, 
+            int? min, int? max, PostSorting? sorting, bool onlyMyCommunities,
+            int page, int size, string token)
         {
-            throw new NotImplementedException();
+            string userId = _tokenHelper.GetIdFromToken(token);
+            User? user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+
+            QueryValidation.IsPostDataValid(page, size, min, max);
+
+            var posts = _db.Posts.AsQueryable();
+            posts = ApplyFilters(posts, tags, author, min, max, onlyMyCommunities, user);
+        }
+
+        private IQueryable<Post> ApplyFilters(IQueryable<Post> posts, List<Guid>? tags, 
+            string? author, int? minReadingTime, int? maxReadingTime, 
+            bool onlyMyCommunities, User? user)
+        {
+            if (tags != null && tags.Any())
+            {
+                foreach (var tagId in tags)
+                {
+                    var tag = _db.Tags.FirstOrDefault(t => t.Id == tagId);
+
+                    if (tag == null)
+                    {
+                        throw new BadRequestException(
+                            ErrorMessages.ConcreteTagNotFound(tagId.ToString())
+                        );
+                    }
+                }
+
+                var postsWithTags = _db.PostTags
+                    .Where(pt => tags.Any(t => t == pt.TagId))
+                    .Select(pt => pt.PostId)
+                    .Distinct();
+
+                posts = posts.Where(post => postsWithTags.Contains(post.Id));
+            }
+
+            if (!string.IsNullOrEmpty(author))
+            {
+                var authorId = _db.Users
+                   .Where(u => u.FullName == author)
+                   .Select(u => u.Id)
+                   .FirstOrDefault();
+
+                posts = posts.Where(post => post.AuthorId == authorId);
+            }
+
+            if (minReadingTime != null)
+            {
+                posts = posts.Where(p => p.ReadingTime >= minReadingTime.Value);
+            }
+
+            if (maxReadingTime != null)
+            {
+                posts = posts.Where(p => p.ReadingTime <= maxReadingTime.Value);
+            }
+
+            if (user != null)
+            {
+                // Посты только тех закрытых комьюнити в которых состоит юзер
+                posts = posts.Where(post =>
+                    post.CommunityId == null || _db.Communities.Any(community =>
+                        community.Id == post.CommunityId &&
+                        (community.IsClosed && _db.CommunityUsers
+                            .Any(c => c.UserId == user.Id && c.CommunityId == community.Id) ||
+                            !community.IsClosed)
+                    ));
+
+            }
+
+            if (onlyMyCommunities)
+            {
+                if (user == null)
+                {
+                    throw new UnauthorizedException(ErrorMessages.ProfileNotFound);
+                }
+
+                posts = posts
+                    .Where(p => _db.CommunityUsers
+                        .Any(c => c.UserId == user.Id && c.CommunityId == p.CommunityId));
+            }
+
+            return posts;
         }
 
         public async Task CreatePost(string token, CreatePostDto createPostDto)
