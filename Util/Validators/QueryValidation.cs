@@ -9,7 +9,7 @@ namespace BackendLaboratory.Util.Validators
         {
             if (size < 1) { throw new BadRequestException(ErrorMessages.InvalidSize); }
 
-            if (page < 1) { throw new BadRequestException(ErrorMessages.InvalidPage); }
+            if (page < 1) { throw new BadRequestException(ErrorMessages.InvalidPages); }
 
             if (min < 0) { throw new BadRequestException(ErrorMessages.InvalidMin); }
 
@@ -20,7 +20,7 @@ namespace BackendLaboratory.Util.Validators
         {
             if (size < 1) { throw new BadRequestException(ErrorMessages.InvalidSize); }
 
-            if (page < 1) { throw new BadRequestException(ErrorMessages.InvalidPage); }
+            if (page < 1) { throw new BadRequestException(ErrorMessages.InvalidPages); }
         }
     }
 }

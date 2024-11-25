@@ -11,9 +11,10 @@
 
         // Pagination data
         public const string InvalidSize = "На странице не может быть меньше 1-го элемента.";
-        public const string InvalidPage = "Должна быть хотя бы одна страница.";
+        public const string InvalidPages = "Должна быть хотя бы одна страница.";
         public const string InvalidMin = "Минимум времени должен быть больше нуля.";
         public const string InvalidMax = "Максимум времени должен быть больше нуля.";
+        public const string PageNotFound = "Такой страницы не существует.";
 
         // Other
         public const string IncorrectId = "Некорректный ID: не удалось извлечь или преобразовать id из токена.";

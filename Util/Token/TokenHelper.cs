@@ -40,14 +40,14 @@ namespace BackendLaboratory.Util.Token
             };
         }
 
-        public string GetIdFromToken(string token)
+        public string? GetIdFromToken(string? token)
         {
-            var jwtToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
-            if (jwtToken == null)
+            if (token.IsNullOrEmpty())
             {
-                Console.WriteLine(jwtToken);
+                return null;
             }
 
+            var jwtToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
             var id = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid).Value;
 
             return id;
