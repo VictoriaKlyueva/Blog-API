@@ -8,8 +8,6 @@ using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
 using BackendLaboratory.Util.Validators;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BackendLaboratory.Repository
 {
@@ -179,7 +177,7 @@ namespace BackendLaboratory.Repository
             }
             else
             {
-                // Посты без закрытых комьюнити=
+                // Посты без закрытых комьюнити
                 posts = posts.Where(post =>
                     post.CommunityId == null || _db.Communities.Any(community =>
                         community.Id == post.CommunityId && !community.IsClosed
