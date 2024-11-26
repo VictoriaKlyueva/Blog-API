@@ -1,4 +1,5 @@
 ﻿using BackendLaboratory.Data.DTO;
+using BackendLaboratory.Data.Entities.Enums;
 using BackendLaboratory.Repository;
 using BackendLaboratory.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
@@ -43,6 +44,21 @@ namespace BackendLaboratory.Controllers
         public async Task<IActionResult> GetCommunityInfo(string id)
         {
             var response = await _communityRepository.GetCommunityInfo(id);
+            return Ok(response);
+        }
+
+        [HttpGet("{id}/post")]
+        public async Task<IActionResult> GetCommunityPosts(
+            string id,
+            [FromQuery] List<Guid>? tags,
+            [FromQuery] PostSorting? sorting,
+            [FromQuery] int page = 1,
+            [FromQuery] int size = 5)
+        {
+            string? token = GetTokenFromHeader();
+
+            var response = await _communityRepository.GetCommunityPosts(tags, sorting, page, 
+                size, token, id);
             return Ok(response);
         }
 

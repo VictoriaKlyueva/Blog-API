@@ -3,10 +3,10 @@ using BackendLaboratory.Data;
 using BackendLaboratory.Data.DTO;
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Data.Entities.Enums;
-using BackendLaboratory.Migrations;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
+using BackendLaboratory.Util.Validators;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendLaboratory.Repository
@@ -92,6 +92,176 @@ namespace BackendLaboratory.Repository
             };
 
             return communityInfo;
+        }
+
+        public async Task<PostPagedListDto> GetCommunityPosts(List<Guid>? tags,
+            PostSorting? sorting, int page, int size, string? token, string id)
+        {
+            var community = await _db.Communities.FirstOrDefaultAsync(c => c.Id.ToString() == id);
+            if (community == null)
+            {
+                throw new NotFoundException(ErrorMessages.CommunityNotFound);
+            }
+
+            string? userId = _tokenHelper.GetIdFromToken(token);
+            User? user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+
+            if (community.IsClosed &&
+                (userId == null || 
+                _db.CommunityUsers
+                    .FirstOrDefault(cu =>
+                        cu.CommunityId.ToString() == id && cu.UserId.ToString() == userId) != null))
+            {
+                throw new ForbiddenException(ErrorMessages.CommunityPostsForbidden);
+            }
+
+            QueryValidation.IsCommunityDataValid(page, size);
+
+            var posts = _db.Posts
+                .Where(post => post.CommunityId.ToString() == id)
+                .AsQueryable();
+
+            posts = ApplyFilters(posts, tags, sorting, user);
+
+            var pagesCount = Math.Max((int)Math.Ceiling((double)posts.Count() / size), 1);
+            if (pagesCount < page) { throw new NotFoundException(ErrorMessages.PageNotFound); }
+
+            var paginatedPosts = ApplyPagination(posts, page, size);
+
+            List<PostDto> paginatedPostsDto = await paginatedPosts
+                .Select(post => new PostDto
+                {
+                    Id = post.Id,
+                    CreateTime = post.CreateTime,
+                    Title = post.Title,
+                    Description = post.Description,
+                    ReadingTime = post.ReadingTime,
+                    Image = post.Image,
+                    AuthorId = post.AuthorId,
+                    Author = AppConstants.EmptyString,
+                    CommunityId = post.CommunityId,
+                    CommunityName = community.Name,
+                    AddressId = post.AddressId,
+                    Likes = post.Likes,
+                    HasLike = false,
+                    CommentsCount = post.CommentsCount,
+                    Tags = new List<TagDto>()
+                })
+                .ToListAsync();
+
+            foreach (var post in paginatedPostsDto)
+            {
+                User? postAuthor = _db.Users.FirstOrDefault(a => a.Id == post.AuthorId);
+                if (postAuthor == null) 
+                { 
+                    throw new NotFoundException(ErrorMessages.AuthorNotFound); 
+                }
+
+                post.Author = postAuthor.FullName;
+
+                var likeLink = await _db.LikesLink
+                .FirstOrDefaultAsync(
+                    cu => cu.UserId.ToString() == userId &&
+                    cu.PostId == post.Id
+                );
+                if (likeLink != null)
+                {
+                    post.HasLike = true;
+                }
+
+                var postTags = await _db.PostTags
+                    .Where(pt => pt.PostId == post.Id)
+                    .Include(pt => pt.Tag)
+                    .ToListAsync();
+
+                if (postTags != null)
+                {
+                    post.Tags = postTags.Select(pt => new TagDto
+                    {
+                        Id = pt.Tag.Id,
+                        CreateTime = pt.Tag.CreateTime,
+                        Name = pt.Tag.Name
+                    }).ToList();
+                }
+            }
+
+            PageInfoModel pageInfoModel = new PageInfoModel
+            {
+                Count = pagesCount,
+                Size = size,
+                Current = page
+            };
+
+            return new PostPagedListDto
+            {
+                Posts = paginatedPostsDto,
+                Pagination = pageInfoModel
+            };
+        }
+
+        private IQueryable<Post> ApplyFilters(IQueryable<Post> posts, List<Guid>? tags,
+            PostSorting? sorting, User? user)
+        {
+            if (tags != null && tags.Any())
+            {
+                foreach (var tagId in tags)
+                {
+                    var tag = _db.Tags.FirstOrDefault(t => t.Id == tagId);
+
+                    if (tag == null)
+                    {
+                        throw new BadRequestException(
+                            ErrorMessages.ConcreteTagNotFound(tagId.ToString())
+                        );
+                    }
+                }
+
+                var postsWithTags = _db.PostTags
+                    .Where(pt => tags.Any(t => t == pt.TagId))
+                    .Select(pt => pt.PostId)
+                    .Distinct();
+
+                posts = posts.Where(post => postsWithTags.Contains(post.Id));
+            }
+               
+            if (user != null)
+            {
+                // Посты только тех закрытых комьюнити в которых состоит юзер
+                posts = posts.Where(post =>
+                    post.CommunityId == null || _db.Communities.Any(community =>
+                        community.Id == post.CommunityId &&
+                        (community.IsClosed && _db.CommunityUsers
+                            .Any(cu => cu.UserId == user.Id && cu.CommunityId == community.Id) ||
+                        !community.IsClosed)
+                    ));
+            }
+            else
+            {
+                // Посты без закрытых комьюнити
+                posts = posts.Where(post =>
+                    post.CommunityId == null || _db.Communities.Any(community =>
+                        community.Id == post.CommunityId && !community.IsClosed
+                    ));
+            }
+
+            posts = sorting switch
+            {
+                PostSorting.CreateAsc => posts.OrderBy(p => p.CreateTime),
+                PostSorting.CreateDesс => posts.OrderByDescending(p => p.CreateTime),
+                PostSorting.LikeAsc => posts.OrderBy(p => p.Likes),
+                PostSorting.LikeDesc => posts.OrderByDescending(p => p.Likes),
+                _ => posts,
+            };
+
+            return posts;
+        }
+
+        private IQueryable<Data.Entities.Post> ApplyPagination(IQueryable<Data.Entities.Post> posts, 
+            int page, int size)
+        {
+            return posts
+                .Skip((page - 1) * size)
+                .Take(size);
         }
 
         public async Task<CommunityRole?> GetCommunityRole(string token, string communityId)

@@ -10,6 +10,9 @@ namespace BackendLaboratory.Repository.IRepository
         Task<List<CommunityUserDto>> GetUserCommunities(string token);
         Task<CommunityFullDto> GetCommunityInfo(string communityId);
 
+        Task<PostPagedListDto> GetCommunityPosts(List<Guid>? tags, 
+            PostSorting? sorting, int page, int size, string? token, string id);
+
         Task<CommunityRole?> GetCommunityRole(string token, string communityId);
 
         Task CreateCommunityPost(string token, string communityId, CreatePostDto createPostDto);

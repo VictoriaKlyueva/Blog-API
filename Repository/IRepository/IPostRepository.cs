@@ -7,7 +7,7 @@ namespace BackendLaboratory.Repository.IRepository
     {
         Task<PostPagedListDto> GetPosts(List<Guid>? tags, string? author, int? min, 
             int? max, PostSorting? sorting, bool onlyMyCommunities, 
-            int page, int size, string token);
+            int page, int size, string? token);
 
         Task CreatePost(string token, CreatePostDto createPostDto);
 
