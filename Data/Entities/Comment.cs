@@ -18,20 +18,15 @@ namespace BackendLaboratory.Data.Entities
 
         public DateTime? DeleteDate { get; set; }
 
+        public Guid? ParentId { get; set; }
+
+        public virtual Comment? ParentComment { get; set; }
+
+        public virtual ICollection<Comment> ChildComments { get; set; } = new List<Comment>();
+
         [Required]
         public Guid AuthorId { get; set; }
 
-        [Required]
-        [MinLength(1)]
-        public required string Author { get; set; }
-
-        [Required]
-        public int SubComments { get; set; }
-
-        public Guid? ParentId { get; set; }
-
         public Guid PostId { get; set; }
-
-        public required List<Comment> SubCommentsEntities { get; set; }
     }
 }

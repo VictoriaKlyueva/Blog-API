@@ -15,6 +15,7 @@ namespace BackendLaboratory.Data
         public DbSet<Post> Posts { get; set; }
         public DbSet<BlackToken> BlackTokens { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<Comment> Comments { get; set; }
         public DbSet<CommunityUser> CommunityUsers { get; set; }
         public DbSet<PostTag> PostTags { get; set; }
         public DbSet<Like> LikesLink { get; set; }
@@ -77,6 +78,12 @@ namespace BackendLaboratory.Data
                     j.HasKey(t => new { t.PostId, t.TagId });
                     j.ToTable("PostTags");
                 });
+
+            modelBuilder.Entity<Comment>()
+               .HasMany(c => c.ChildComments)
+               .WithOne(c => c.ParentComment)
+               .HasForeignKey(c => c.ParentId)
+               .OnDelete(DeleteBehavior.Cascade);
 
             AddAdminData(modelBuilder);
         }
