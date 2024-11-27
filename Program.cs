@@ -120,7 +120,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // Configure custom middlewares 
-// app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {

@@ -28,6 +28,16 @@ namespace BackendLaboratory.Repository
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 
+            if (createCommentDto.ParentId != null)
+            {
+                var parentComment = _db.Comments
+                .FirstOrDefault(c => c.Id == createCommentDto.ParentId);
+                if (parentComment == null)
+                {
+                    throw new NotFoundException(ErrorMessages.ParentCommentNotFound);
+                }
+            }
+            
             var post = await _db.Posts
                 .FirstOrDefaultAsync(post => post.Id.ToString() == postId);
 
@@ -78,7 +88,6 @@ namespace BackendLaboratory.Repository
 
             var comment = await _db.Comments
                 .FirstOrDefaultAsync(c => c.Id.ToString() == commentId);
-
             if (comment == null) { throw new NotFoundException(ErrorMessages.CommentNotFound); }
 
             if (comment.AuthorId.ToString() != userId)
@@ -87,6 +96,25 @@ namespace BackendLaboratory.Repository
             }
 
             comment.Content = updateCommentDto.Content;
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task DeleteComment(string commentId, string token)
+        {
+            string userId = _tokenHelper.GetIdFromToken(token);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+            if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            var comment = await _db.Comments
+                .FirstOrDefaultAsync(c => c.Id.ToString() == commentId);
+            if (comment == null) { throw new NotFoundException(ErrorMessages.CommentNotFound); }
+
+            if (comment.AuthorId.ToString() != userId)
+            {
+                throw new ForbiddenException(ErrorMessages.CommentForbidden);
+            }
+
+            _db.Comments.Remove(comment);
             await _db.SaveChangesAsync();
         }
     }

@@ -9,5 +9,7 @@ namespace BackendLaboratory.Repository.IRepository
 
         Task EditComment(string commentId, string token,
             UpdateCommentDto updateCommentDto);
+
+        Task DeleteComment(string commentId, string token);
     }
 }

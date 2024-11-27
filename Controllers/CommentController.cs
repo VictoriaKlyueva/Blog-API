@@ -43,5 +43,15 @@ namespace BackendLaboratory.Controllers
             await _commentRepository.EditComment(id, token, updateCommentDto);
             return Ok();
         }
+
+        [HttpDelete("comment/{id}")]
+        [Authorize(Policy = "TokenBlackListPolicy")]
+        public async Task<IActionResult> DeleteComment(string id)
+        {
+            string token = GetTokenFromHeader();
+
+            await _commentRepository.DeleteComment(id, token);
+            return Ok();
+        }
     }
 }
