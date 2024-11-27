@@ -6,5 +6,8 @@ namespace BackendLaboratory.Repository.IRepository
     {
         Task AddComment(string postId, string token, 
             CreateCommentDto createCommentDto);
+
+        Task EditComment(string commentId, string token,
+            UpdateCommentDto updateCommentDto);
     }
 }

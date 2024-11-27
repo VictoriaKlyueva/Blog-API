@@ -32,5 +32,16 @@ namespace BackendLaboratory.Controllers
             await _commentRepository.AddComment(id, token, createCommentDto);
             return Ok();
         }
+
+        [HttpPut("comment/{id}")]
+        [Authorize(Policy = "TokenBlackListPolicy")]
+        public async Task<IActionResult> EditComment([FromBody] UpdateCommentDto updateCommentDto,
+            string id)
+        {
+            string token = GetTokenFromHeader();
+
+            await _commentRepository.EditComment(id, token, updateCommentDto);
+            return Ok();
+        }
     }
 }

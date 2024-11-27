@@ -2,6 +2,7 @@
 using BackendLaboratory.Data;
 using BackendLaboratory.Data.DTO;
 using BackendLaboratory.Data.Entities;
+using BackendLaboratory.Migrations;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
@@ -65,6 +66,27 @@ namespace BackendLaboratory.Repository
             };
 
             _db.Comments.Add(comment);
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task EditComment(string commentId, string token, 
+            UpdateCommentDto updateCommentDto)
+        {
+            string userId = _tokenHelper.GetIdFromToken(token);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+            if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            var comment = await _db.Comments
+                .FirstOrDefaultAsync(c => c.Id.ToString() == commentId);
+
+            if (comment == null) { throw new NotFoundException(ErrorMessages.CommentNotFound); }
+
+            if (comment.AuthorId.ToString() != userId)
+            {
+                throw new ForbiddenException(ErrorMessages.CommentForbidden);
+            }
+
+            comment.Content = updateCommentDto.Content;
             await _db.SaveChangesAsync();
         }
     }

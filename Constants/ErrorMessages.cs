@@ -33,6 +33,8 @@
         public const string CommunityPostsForbidden = "Посты этой группы недоступны этому пользователю.";
         public const string LikeIsAlreadyAdded = "Пользователь уже поставил лайк на этот пост.";
         public const string LikeHasntBeenAdded = "У пользователя нет лайка на этот пост.";
+        public const string CommentNotFound = "Комментарий не найден.";
+        public const string CommentForbidden = "Это не комментарий пользователя. Пользователь может редактировать только свои комментарии.";
 
         public static string ConcreteTagNotFound(string tag)
         {
