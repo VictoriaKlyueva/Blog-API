@@ -262,11 +262,10 @@ namespace BackendLaboratory.Repository
             }
         }
 
-        public async Task<PostFullDto> GetPostInfo(string token, string postId)
+        public async Task<PostFullDto> GetPostInfo(string? token, string postId)
         {
-            string userId = _tokenHelper.GetIdFromToken(token);
+            string? userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
-            if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 
             var post = await _db.Posts.FirstOrDefaultAsync(c => c.Id.ToString() == postId);
             if (post == null) { throw new NotFoundException(ErrorMessages.CommunityNotFound); }
@@ -281,6 +280,11 @@ namespace BackendLaboratory.Repository
                 // Если сообщество закрытое, то пользователь должен быть подписан
                 if (community.IsClosed)
                 {
+                    if (user == null)
+                    { 
+                        throw new ForbiddenException(ErrorMessages.PostForbidden);
+                    }
+
                     var communityUser = await _db.CommunityUsers
                         .FirstOrDefaultAsync(
                             cu => cu.UserId.ToString() == userId && 
@@ -311,7 +315,7 @@ namespace BackendLaboratory.Repository
                 HasLike = false,
                 CommentsCount = post.CommentsCount,
                 Tags = new List<TagDto>(),
-                Comments = new List<CommentDto>() // Заменить на комментарии
+                Comments = new List<CommentDto>()
             };
 
             var author = await _db.Users.FirstOrDefaultAsync(a => a.Id == post.AuthorId);
@@ -350,6 +354,34 @@ namespace BackendLaboratory.Repository
                 }).ToList();
             }
 
+            var comments = _db.Comments
+                .Where(c => c.PostId.ToString() == postId && c.ParentId == null)
+                .Select(c => new CommentDto
+                {
+                    Id = c.Id.ToString(),
+                    CreateTime = c.CreateTime,
+                    Content = c.Content,
+                    ModifiedDate = c.ModifiedDate,
+                    DeleteDate = c.DeleteDate,
+                    AuthorId = c.AuthorId.ToString(),
+                    Author = AppConstants.EmptyString,
+                    SubComments = c.ChildComments.Count
+                })
+                .ToList();
+
+            for (int i = 0; i < comments.Count; i++ )
+            {
+                var commentAuthor = _db.Users
+                    .FirstOrDefault(u => u.Id.ToString() == comments[i].AuthorId);
+                if (commentAuthor == null)
+                {
+                    throw new NotFoundException(ErrorMessages.AuthorNotFound);
+                }
+
+                comments[i].Author = commentAuthor.FullName;
+            }
+
+            postFullDto.Comments = comments;
             return postFullDto;
         }
 

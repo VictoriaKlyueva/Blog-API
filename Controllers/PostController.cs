@@ -54,10 +54,9 @@ namespace BackendLaboratory.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Policy = "TokenBlackListPolicy")]
         public async Task<IActionResult> GetPostInfo(string id)
         {
-            string token = GetTokenFromHeader();
+            string? token = GetTokenFromHeader();
 
             var responce = await _postRepository.GetPostInfo(token, id);
             return Ok(responce);
