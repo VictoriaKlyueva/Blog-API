@@ -7,6 +7,8 @@ using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
+using System.ComponentModel.Design;
 
 namespace BackendLaboratory.Repository
 {
@@ -19,6 +21,71 @@ namespace BackendLaboratory.Repository
         {
             _db = db;
             _tokenHelper = new TokenHelper(configuration);
+        }
+
+        public async Task<List<CommentDto>> GetCommentsTree(string parentId, string? token)
+        {
+            string? userId = _tokenHelper.GetIdFromToken(token);
+            User? user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+
+            // Проверка, что комментарий доступен юзеру
+
+            var root = await _db.Comments
+                .Include(c => c.ChildComments)
+                .FirstOrDefaultAsync(c => c.Id.ToString() == parentId);
+
+            if (root == null) 
+            { 
+                throw new NotFoundException(ErrorMessages.CommentNotFound); 
+            }
+            if (root.ParentId != null)
+            {
+                throw new BadRequestException(ErrorMessages.CommentIsNotRoot);
+            }
+
+            var commentTree = GetCommentChilds(root.Id);
+            commentTree.RemoveAt(0);
+
+            return commentTree;
+        }
+
+        // Доделать
+        private List<CommentDto> GetCommentChilds(Guid commentId)
+        {
+            var comment = _db.Comments
+                .Include(c => c.ChildComments)
+                .FirstOrDefault(c => c.Id == commentId);
+
+            if (comment == null) 
+            { 
+                throw new NotFoundException(ErrorMessages.ConcreteCommentNotFound(commentId.ToString()));
+            }
+
+            CommentDto commentDto = new CommentDto
+            {
+                Id = comment.Id.ToString(),
+                CreateTime = comment.CreateTime,
+                Content = comment.Content,
+                ModifiedDate = comment.ModifiedDate,
+                DeleteDate = comment.DeleteDate,
+                AuthorId = comment.AuthorId.ToString(),
+                Author = AppConstants.EmptyString, // Заменить на автора
+                SubComments = comment.ChildComments.Count
+            };
+
+            var commentAuthor = _db.Users.FirstOrDefault(u => u.Id == comment.AuthorId);
+            if (commentAuthor == null) { throw new NotFoundException(ErrorMessages.AuthorNotFound); };
+            commentDto.Author = commentAuthor.FullName;
+            
+            var commentTree = new List<CommentDto> { commentDto };
+
+            foreach (var subComment in comment.ChildComments)
+            {
+                var subCommentTree = GetCommentChilds(subComment.Id);
+                commentTree.AddRange(subCommentTree);
+            }
+
+            return commentTree;
         }
 
         public async Task AddComment(string postId, string token,

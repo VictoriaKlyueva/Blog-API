@@ -36,10 +36,16 @@
         public const string CommentNotFound = "Комментарий не найден.";
         public const string ParentCommentNotFound = "Родительский комментарий не найден.";
         public const string CommentForbidden = "Это не комментарий пользователя. Пользователь может редактировать и удалять только свои комментарии.";
+        public const string CommentIsNotRoot = "Комментарий не является корневым.";
 
-        public static string ConcreteTagNotFound(string tag)
+        public static string ConcreteTagNotFound(string tagId)
         {
-            return $"Tag with id {tag} not found";
+            return $"Tag with id {tagId} not found";
+        }
+
+        public static string ConcreteCommentNotFound(string commentId)
+        {
+            return $"Tag with id {commentId} not found";
         }
     }
 }

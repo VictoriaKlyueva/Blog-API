@@ -22,6 +22,15 @@ namespace BackendLaboratory.Controllers
             return HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         }
 
+        [HttpGet("comment/{id}/tree")]
+        public async Task<IActionResult> GetCommentsTree(string id)
+        {
+            string? token = GetTokenFromHeader();
+
+            var response = await _commentRepository.GetCommentsTree(id, token);
+            return Ok(response);
+        }
+
         [HttpPost("post/{id}/comment")]
         [Authorize(Policy = "TokenBlackListPolicy")]
         public async Task<IActionResult> AddComment([FromBody] CreateCommentDto createCommentDto, 
