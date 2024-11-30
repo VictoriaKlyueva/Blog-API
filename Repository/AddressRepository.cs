@@ -19,6 +19,11 @@ namespace BackendLaboratory.Repository
         {
             var result = new List<SearchAddressModel>();
 
+            if (parentObjectId == null)
+            {
+                parentObjectId = 0;
+            }
+
             var addresses = _db.AsAddrObjs
                 .Where(x => x.Parentobjid == parentObjectId)
                 .AsQueryable();
@@ -43,7 +48,7 @@ namespace BackendLaboratory.Repository
                 result = addresses.Select(a => new SearchAddressModel
                 {
                     ObjectId = a.ObjectId,
-                    ObjectGuid = a.Objectguid,
+                    ObjectGuid = a.ObjectGuid,
                     Text = AddressHelper.GetAddressName(a.Typename, a.Name),
                     ObjectLevel = AddressHelper.GetAddressLevel(Convert.ToInt32(a.Level)),
                     ObjectLevelText = AddressHelper.GetAddressLevelName(Convert.ToInt32(a.Level))

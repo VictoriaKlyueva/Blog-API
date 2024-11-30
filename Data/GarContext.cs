@@ -29,7 +29,8 @@ namespace BackendLaboratory.Data
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.Level).HasColumnName("level");
                 entity.Property(e => e.Name).HasColumnName("name");
-                entity.Property(e => e.Objectguid).HasColumnName("objectguid");
+                entity.Property(e => e.ObjectId).HasColumnName("objectid");
+                entity.Property(e => e.ObjectGuid).HasColumnName("objectguid");
                 entity.Property(e => e.Typename).HasColumnName("typename");
                 entity.Property(e => e.Parentobjid).HasColumnName("parentobjid");
                 entity.Property(e => e.Path).HasColumnName("path");
@@ -47,6 +48,7 @@ namespace BackendLaboratory.Data
                 entity.Property(e => e.Housetype).HasColumnName("housetype");
                 entity.Property(e => e.Addtype1).HasColumnName("addtype1");
                 entity.Property(e => e.Addtype2).HasColumnName("addtype2");
+                entity.Property(e => e.ObjectId).HasColumnName("objectid");
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.Objectguid).HasColumnName("objectguid");
                 entity.Property(e => e.Parentobjid).HasColumnName("parentobjid");
