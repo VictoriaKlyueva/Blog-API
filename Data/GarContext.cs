@@ -9,7 +9,7 @@ namespace BackendLaboratory.Data
         {
         }
 
-        public GarContext(DbContextOptions<AppDBContext> options)
+        public GarContext(DbContextOptions<GarContext> options)
             : base(options)
         {
         }
@@ -41,9 +41,12 @@ namespace BackendLaboratory.Data
                     .HasNoKey()
                     .ToTable("as_houses");
 
+                entity.Property(e => e.Housenum).HasColumnName("housenum");
                 entity.Property(e => e.Addnum1).HasColumnName("addnum1");
                 entity.Property(e => e.Addnum2).HasColumnName("addnum2");
-                entity.Property(e => e.Housenum).HasColumnName("housenum");
+                entity.Property(e => e.Housetype).HasColumnName("housetype");
+                entity.Property(e => e.Addtype1).HasColumnName("addtype1");
+                entity.Property(e => e.Addtype2).HasColumnName("addtype2");
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.Objectguid).HasColumnName("objectguid");
                 entity.Property(e => e.Parentobjid).HasColumnName("parentobjid");

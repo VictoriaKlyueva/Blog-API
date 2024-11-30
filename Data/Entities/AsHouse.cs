@@ -10,9 +10,15 @@
 
         public required string Housenum { get; set; }
 
-        public required string Addnum1 { get; set; }
+        public string? Addnum1 { get; set; }
 
-        public required string Addnum2 { get; set; }
+        public string? Addnum2 { get; set; }
+
+        public int Housetype { get; set; }
+
+        public int? Addtype1 { get; set; }
+
+        public int? Addtype2 { get; set; }
 
         public long Parentobjid { get; set; }
 
