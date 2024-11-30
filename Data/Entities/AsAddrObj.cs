@@ -1,4 +1,4 @@
-﻿namespace BackendLaboratory.Data
+﻿namespace BackendLaboratory.Data.Entities
 {
     public class AsAddrObj
     {

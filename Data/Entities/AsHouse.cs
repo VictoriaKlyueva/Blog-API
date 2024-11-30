@@ -1,6 +1,6 @@
 ﻿namespace BackendLaboratory.Data.Entities
 {
-    public class AsHouses
+    public class AsHouse
     {
         public long Id { get; set; }
 
