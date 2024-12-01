@@ -5,5 +5,7 @@ namespace BackendLaboratory.Repository.IRepository
     public interface IAddressRepository
     {
         Task<List<SearchAddressModel>> SearchAdress(long? parentObjectId, string? query);
+
+        Task<List<SearchAddressModel>> GetAddressChain(string? parentObjectId, string? query);
     }
 }

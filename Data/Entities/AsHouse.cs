@@ -2,7 +2,6 @@
 {
     public class AsHouse
     {
-        public long Id { get; set; }
 
         public long ObjectId { get; set; }
 

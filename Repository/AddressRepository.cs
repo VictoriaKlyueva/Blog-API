@@ -66,5 +66,10 @@ namespace BackendLaboratory.Repository
 
             return result;
         }
+
+        public Task<List<SearchAddressModel>> GetAddressChain(string? parentObjectId, string? query)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
