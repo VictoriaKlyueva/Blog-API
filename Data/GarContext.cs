@@ -33,7 +33,6 @@ namespace BackendLaboratory.Data
                 entity.Property(e => e.ObjectGuid).HasColumnName("objectguid");
                 entity.Property(e => e.Typename).HasColumnName("typename");
                 entity.Property(e => e.Parentobjid).HasColumnName("parentobjid");
-                entity.Property(e => e.Path).HasColumnName("path");
             });
 
             modelBuilder.Entity<AsHouse>(entity =>
@@ -52,7 +51,6 @@ namespace BackendLaboratory.Data
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.Objectguid).HasColumnName("objectguid");
                 entity.Property(e => e.Parentobjid).HasColumnName("parentobjid");
-                entity.Property(e => e.Path).HasColumnName("path");
             });
 
             OnModelCreatingPartial(modelBuilder);

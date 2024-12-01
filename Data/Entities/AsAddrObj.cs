@@ -15,7 +15,5 @@
         public required string Level { get; set; }
 
         public long? Parentobjid { get; set; }
-
-        public required string Path { get; set; }
     }
 }
