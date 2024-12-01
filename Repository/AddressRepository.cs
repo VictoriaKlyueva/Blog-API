@@ -47,25 +47,11 @@ namespace BackendLaboratory.Repository
                     .Where(x => x.Parentobjid == parentObjectId)
                     .AsQueryable();
 
-                result = houses.Select(h => new SearchAddressModel
-                {
-                    ObjectId = h.ObjectId,
-                    ObjectGuid = h.Objectguid,
-                    Text = AddressHelper.GetHouseName(h),
-                    ObjectLevel = ObjectLevel.Building,
-                    ObjectLevelText = AddressHelper.GetAddressLevelName(10)
-                }).ToList();
+                result = houses.Select(HouseToSearchModel).ToList();
             }
             else
             {
-                result = addresses.Select(a => new SearchAddressModel
-                {
-                    ObjectId = a.ObjectId,
-                    ObjectGuid = a.ObjectGuid,
-                    Text = AddressHelper.GetAddressName(a.Typename, a.Name),
-                    ObjectLevel = AddressHelper.GetAddressLevel(Convert.ToInt32(a.Level)),
-                    ObjectLevelText = AddressHelper.GetAddressLevelName(Convert.ToInt32(a.Level))
-                }).ToList();
+                result = addresses.Select(AddressToSearchModel).ToList();
             }
 
             if (query != null)
@@ -80,9 +66,73 @@ namespace BackendLaboratory.Repository
             return result;
         }
 
-        public Task<List<SearchAddressModel>> GetAddressChain(string? parentObjectId, string? query)
+        public async Task<List<SearchAddressModel>> GetAddressChain(string? objectId)
         {
-            throw new NotImplementedException();
+            var result = new List<SearchAddressModel>();
+
+            if (objectId == null)
+            {
+                throw new NotFoundException(ErrorMessages.AddressNotFound);
+            }
+
+            var addressObject = await _db.AsAddrObjs
+                    .FirstOrDefaultAsync(a => a.ObjectGuid.ToString() == objectId);
+
+            long currentObjectId;
+            if (addressObject == null)
+            {
+                var housesObject = await _db.AsHouses
+                    .FirstOrDefaultAsync(h => h.ObjectGuid.ToString() == objectId);
+
+                if (housesObject == null)
+                {
+                    throw new NotFoundException(ErrorMessages.AddressNotFound);
+                }
+
+                currentObjectId = housesObject.Parentobjid;
+                result.Add(HouseToSearchModel(housesObject));
+            }
+            else
+            {
+                currentObjectId = addressObject.Parentobjid;
+                result.Add(AddressToSearchModel(addressObject));
+            }
+
+            var currentObject = await _db.AsAddrObjs
+                .FirstAsync(a => a.ObjectId == currentObjectId);
+            while (currentObject != null)
+            {
+                result.Add(AddressToSearchModel(currentObject));
+                currentObject = await _db.AsAddrObjs
+                    .FirstOrDefaultAsync(a => a.ObjectId == currentObject.Parentobjid);
+            }
+
+            result.Reverse();
+            return result;
+        }
+
+        private SearchAddressModel AddressToSearchModel(AsAddrObj asAddrObj)
+        {
+            return new SearchAddressModel
+            {
+                ObjectId = asAddrObj.ObjectId,
+                ObjectGuid = asAddrObj.ObjectGuid,
+                Text = AddressHelper.GetAddressName(asAddrObj.Typename, asAddrObj.Name),
+                ObjectLevel = AddressHelper.GetAddressLevel(Convert.ToInt32(asAddrObj.Level)),
+                ObjectLevelText = AddressHelper.GetAddressLevelName(Convert.ToInt32(asAddrObj.Level))
+            };
+        }
+
+        private SearchAddressModel HouseToSearchModel(AsHouse asHouse)
+        {
+            return new SearchAddressModel
+            {
+                ObjectId = asHouse.ObjectId,
+                ObjectGuid = asHouse.ObjectGuid,
+                Text = AddressHelper.GetHouseName(asHouse),
+                ObjectLevel = ObjectLevel.Building,
+                ObjectLevelText = AddressHelper.GetAddressLevelName(10)
+            };
         }
     }
 }

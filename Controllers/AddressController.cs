@@ -24,5 +24,12 @@ namespace BackendLaboratory.Controllers
             var response = await _addressRepository.SearchAdress(parentObjectId, query);
             return Ok(response);
         }
+
+        [HttpGet("chain")]
+        public async Task<IActionResult> GetAddressChain([FromQuery] string? objectId)
+        {
+            var response = await _addressRepository.GetAddressChain(objectId);
+            return Ok(response);
+        }
     }
 }

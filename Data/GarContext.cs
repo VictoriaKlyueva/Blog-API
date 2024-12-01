@@ -41,7 +41,7 @@ namespace BackendLaboratory.Data
                     .ToTable("as_houses");
 
                 entity.Property(e => e.ObjectId).HasColumnName("objectid");
-                entity.Property(e => e.Objectguid).HasColumnName("objectguid");
+                entity.Property(e => e.ObjectGuid).HasColumnName("objectguid");
                 entity.Property(e => e.Housenum).HasColumnName("housenum");
                 entity.Property(e => e.Addnum1).HasColumnName("addnum1");
                 entity.Property(e => e.Addnum2).HasColumnName("addnum2");

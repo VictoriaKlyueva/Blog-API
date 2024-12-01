@@ -5,7 +5,7 @@
 
         public long ObjectId { get; set; }
 
-        public Guid Objectguid { get; set; }
+        public Guid ObjectGuid { get; set; }
 
         public required string Housenum { get; set; }
 
