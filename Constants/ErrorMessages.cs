@@ -37,6 +37,7 @@
         public const string ParentCommentNotFound = "Родительский комментарий не найден.";
         public const string CommentForbidden = "Это не комментарий пользователя. Пользователь может редактировать и удалять только свои комментарии.";
         public const string CommentIsNotRoot = "Комментарий не является корневым.";
+        public const string AddressNotFound = "Такой адресс не существует.";
 
         public static string ConcreteTagNotFound(string tagId)
         {

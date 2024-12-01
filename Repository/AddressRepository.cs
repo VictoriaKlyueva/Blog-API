@@ -1,8 +1,11 @@
-﻿using BackendLaboratory.Data;
+﻿using BackendLaboratory.Constants;
+using BackendLaboratory.Data;
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Data.Entities.Enums;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util.Address;
+using BackendLaboratory.Util.CustomExceptions.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackendLaboratory.Repository
 {
@@ -22,6 +25,16 @@ namespace BackendLaboratory.Repository
             if (parentObjectId == null)
             {
                 parentObjectId = 0;
+            }
+            else
+            {
+                var parentObject = await _db.AsAddrObjs
+                    .FirstOrDefaultAsync(a => a.ObjectId == parentObjectId);
+
+                if (parentObject == null)
+                { 
+                    throw new NotFoundException(ErrorMessages.AddressNotFound); 
+                } 
             }
 
             var addresses = _db.AsAddrObjs
