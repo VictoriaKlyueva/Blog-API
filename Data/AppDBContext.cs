@@ -154,7 +154,7 @@ namespace BackendLaboratory.Data
                     Name = "Масонская ложа", 
                     Description = "Место, помещение, где собираются масоны для проведения своих собраний, чаще называемых работами", 
                     IsClosed = true,
-                    SubscribersCount = 44,
+                    SubscribersCount = 0,
                     Id = Guid.Parse("21db62c6-a964-45c1-17e0-08dbea521a96"), 
                     CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106622"), DateTimeKind.Utc) 
                 },
@@ -163,7 +163,7 @@ namespace BackendLaboratory.Data
                     Name = "Следствие вели с Л. Каневским",
                     Description = "Без длинных предисловий: мужчина умер",
                     IsClosed = false,
-                    SubscribersCount = 34,
+                    SubscribersCount = 0,
                     Id = Guid.Parse("c5639aab-3a25-4efc-17e1-08dbea521a96"),
                     CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106695"), DateTimeKind.Utc)
                 },
@@ -172,11 +172,29 @@ namespace BackendLaboratory.Data
                     Name = "IT <3",
                     Description = "Информационные технологии связаны с изучением методов и средств сбора, обработки и передачи данных с целью получения информации нового качества о состоянии объекта, процесса или явления",
                     IsClosed = false,
-                    SubscribersCount = 31,
+                    SubscribersCount = 0,
                     Id = Guid.Parse("b9851a35-b836-47f8-17e2-08dbea521a96"),
                     CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106705"), DateTimeKind.Utc)
                 }
             );
+        }
+
+        public override int SaveChanges()
+        {
+            int result = base.SaveChanges();
+            UpdateSubscribersCount();
+            return result;
+        }
+
+        private void UpdateSubscribersCount()
+        {
+            var communities = Communities.ToList();
+            foreach (var community in communities)
+            {
+                var count = CommunityUsers.Count(cu => cu.CommunityId == community.Id);
+                community.SubscribersCount = count;
+            }
+            SaveChanges();
         }
     }
 }

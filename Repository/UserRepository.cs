@@ -120,7 +120,7 @@ namespace BackendLaboratory.Repository
 
         public async Task Logout(string token)
         {
-            string id = _tokenHelper.GetIdFromToken(token);
+            var id = _tokenHelper.GetIdFromToken(token);
 
             if (Guid.TryParse(id, out Guid doctorId) && doctorId != Guid.Empty)
             {
@@ -135,7 +135,7 @@ namespace BackendLaboratory.Repository
 
         public async Task<UserDto> GetProfile(string token)
         {
-            string userId = _tokenHelper.GetIdFromToken(token);
+            var  userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
 
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
@@ -156,7 +156,7 @@ namespace BackendLaboratory.Repository
         {
             ValidateUser(UserEditModel);
 
-            string userId = _tokenHelper.GetIdFromToken(token);
+            var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user != _db.Users.FirstOrDefault(x => x.Email == UserEditModel.Email))
             {

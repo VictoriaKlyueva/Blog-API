@@ -256,8 +256,7 @@ namespace BackendLaboratory.Repository
             return posts;
         }
 
-        private IQueryable<Data.Entities.Post> ApplyPagination(IQueryable<Data.Entities.Post> posts, 
-            int page, int size)
+        private IQueryable<Post> ApplyPagination(IQueryable<Post> posts, int page, int size)
         {
             return posts
                 .Skip((page - 1) * size)
@@ -359,7 +358,7 @@ namespace BackendLaboratory.Repository
 
         public async Task SubscribeToCommunity(string token, string communityId)
         {
-            string userId = _tokenHelper.GetIdFromToken(token);
+            var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 
@@ -374,12 +373,14 @@ namespace BackendLaboratory.Repository
             }
 
             user.CommunityUsers.Add(new CommunityUser { Community = community, Role = CommunityRole.Substriber });
+            community.SubscribersCount += 1;
+
             await _db.SaveChangesAsync();
         }
 
         public async Task UnsubscribeFromCommunity(string token, string communityId)
         {
-            string userId = _tokenHelper.GetIdFromToken(token);
+            var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 
@@ -394,6 +395,8 @@ namespace BackendLaboratory.Repository
             }
 
             _db.CommunityUsers.Remove(communityUser);
+            community.SubscribersCount -= 1;
+
             await _db.SaveChangesAsync();
         }
     }

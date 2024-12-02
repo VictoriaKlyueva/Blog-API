@@ -1,7 +1,5 @@
 ﻿using BackendLaboratory.Data.DTO;
-using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Data.Entities.Enums;
-using BackendLaboratory.Repository;
 using BackendLaboratory.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
