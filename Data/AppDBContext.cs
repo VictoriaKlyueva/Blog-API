@@ -90,65 +90,6 @@ namespace BackendLaboratory.Data
 
         private void AddAdminData(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Tag>().HasData(
-                new Tag
-                {
-                    Name = "задор",
-                    Id = Guid.Parse("7dd1e51a-606f-4dea-e6e3-08dbea521a91"),
-                    CreateTime = DateTime.UtcNow
-                },
-                new Tag { 
-                    Name = "история", 
-                    Id = Guid.Parse("7dd0e51a-606f-4dea-e6e3-08dbea521a91"), 
-                    CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106519"), DateTimeKind.Utc) 
-                },
-                new Tag {
-                    Name = "еда", 
-                    Id = Guid.Parse("d774dd11-2600-46ab-e6e4-08dbea521a91"), 
-                    CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106539"), DateTimeKind.Utc) 
-                },
-                new Tag { 
-                    Name = "18+", 
-                    Id = Guid.Parse("341aa6d9-cf7b-4a99-e6e5-08dbea521a91"), 
-                    CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106543"), DateTimeKind.Utc)
-                },
-                new Tag {
-                    Name = "приколы", 
-                    Id = Guid.Parse("553f5361-428a-4122-e6e6-08dbea521a91"), 
-                    CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106553"), DateTimeKind.Utc) 
-                },
-                new Tag { 
-                    Name = "it", 
-                    Id = Guid.Parse("86acb301-05ff-4822-e6e7-08dbea521a91"), 
-                    CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106563"), DateTimeKind.Utc) 
-                },
-                new Tag {
-                    Name = "интернет", 
-                    Id = Guid.Parse("e587312f-4df7-4879-e6e8-08dbea521a91"), 
-                    CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106573"), DateTimeKind.Utc) 
-                },
-                new Tag {
-                    Name = "теория_заговора", 
-                    Id = Guid.Parse("47aa0a33-2b86-4039-e6e9-08dbea521a91"), 
-                    CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106583"), DateTimeKind.Utc) 
-                },
-                new Tag { 
-                    Name = "соцсети", 
-                    Id = Guid.Parse("e463050a-d659-433d-e6ea-08dbea521a91"), 
-                    CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106592"), DateTimeKind.Utc) 
-                },
-                new Tag {
-                    Name = "косплей", 
-                    Id = Guid.Parse("0c64569f-5675-484b-e6eb-08dbea521a91"), 
-                    CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.810660"), DateTimeKind.Utc) 
-                },
-                new Tag { 
-                    Name = "преступление", 
-                    Id = Guid.Parse("fb1f2ce1-6943-420f-e6ec-08dbea521a91"), 
-                    CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106612"), DateTimeKind.Utc) 
-                }
-            );
-
             modelBuilder.Entity<Community>().HasData(
                 new Community { 
                     Name = "Масонская ложа", 
@@ -177,24 +118,6 @@ namespace BackendLaboratory.Data
                     CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106705"), DateTimeKind.Utc)
                 }
             );
-        }
-
-        public override int SaveChanges()
-        {
-            int result = base.SaveChanges();
-            UpdateSubscribersCount();
-            return result;
-        }
-
-        private void UpdateSubscribersCount()
-        {
-            var communities = Communities.ToList();
-            foreach (var community in communities)
-            {
-                var count = CommunityUsers.Count(cu => cu.CommunityId == community.Id);
-                community.SubscribersCount = count;
-            }
-            SaveChanges();
         }
     }
 }
