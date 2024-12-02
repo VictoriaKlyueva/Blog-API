@@ -217,7 +217,7 @@ namespace BackendLaboratory.Repository
 
         public async Task CreatePost(string token, CreatePostDto createPostDto)
         {
-            string userId = _tokenHelper.GetIdFromToken(token);
+            var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 
@@ -387,7 +387,7 @@ namespace BackendLaboratory.Repository
 
         public async Task AddLike(string token, string postId)
         {
-            string userId = _tokenHelper.GetIdFromToken(token);
+            var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 
@@ -440,7 +440,7 @@ namespace BackendLaboratory.Repository
 
         public async Task DeleteLike(string token, string postId)
         {
-            string userId = _tokenHelper.GetIdFromToken(token);
+            var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 

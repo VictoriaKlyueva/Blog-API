@@ -7,6 +7,7 @@ using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.Design;
 
@@ -91,7 +92,7 @@ namespace BackendLaboratory.Repository
         public async Task AddComment(string postId, string token,
             CreateCommentDto createCommentDto)
         {
-            string userId = _tokenHelper.GetIdFromToken(token);
+            var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 
@@ -143,6 +144,8 @@ namespace BackendLaboratory.Repository
             };
 
             _db.Comments.Add(comment);
+            post.CommentsCount += 1;
+
             await _db.SaveChangesAsync();
         }
 
@@ -168,7 +171,7 @@ namespace BackendLaboratory.Repository
 
         public async Task DeleteComment(string commentId, string token)
         {
-            string userId = _tokenHelper.GetIdFromToken(token);
+            var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 
@@ -181,7 +184,14 @@ namespace BackendLaboratory.Repository
                 throw new ForbiddenException(ErrorMessages.CommentForbidden);
             }
 
+            var post = await _db.Posts
+                .FirstOrDefaultAsync(post => post.Id == comment.PostId);
+
+            if (post == null) { throw new NotFoundException(ErrorMessages.PostNotFound); }
+
             _db.Comments.Remove(comment);
+            post.CommentsCount -= 1;
+
             await _db.SaveChangesAsync();
         }
     }
