@@ -1,6 +1,9 @@
 using BackendLaboratory.Data;
+using BackendLaboratory.Data.Mailing;
 using BackendLaboratory.Repository;
 using BackendLaboratory.Repository.IRepository;
+using BackendLaboratory.Service;
+using BackendLaboratory.Service.IService;
 using BackendLaboratory.Util.CustomExceptions;
 using BackendLaboratory.Util.Token;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,7 +22,14 @@ builder.Services.AddDbContext<AppDBContext>(options =>
 builder.Services.AddDbContext<GarContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("GarConnection")));
 
-builder.Services.AddControllers().AddJsonOptions(options =>
+var emailConfig = builder.Configuration
+        .GetSection("EmailConfiguration")
+        .Get<EmailConfiguration>();
+builder.Services.AddSingleton(emailConfig!);
+
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 });
@@ -75,6 +85,7 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IAuthorizationHandler, TokenBlackListPolicy>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 // Configure JWT authentication
 var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
