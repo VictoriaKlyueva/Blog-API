@@ -13,6 +13,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using Quartz;
+using BackendLaboratory.Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,6 +76,25 @@ builder.Services.AddAuthorization(services =>
             policy.Requirements.Add(new TokenBlackListRequirment())
     );
 });
+
+builder.Services.AddQuartz(q =>
+{
+    q.UseMicrosoftDependencyInjectionJobFactory();
+
+    var jobKey = new JobKey("PostNotificationJob");
+    q.AddJob<PostNotificationJob>(opts => opts
+        .WithIdentity(jobKey));
+
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey) // Используйте тот же JobKey
+        .WithIdentity("PostNotificationTrigger")
+        .StartNow()
+        .WithSimpleSchedule(x => x
+            .WithInterval(TimeSpan.FromMinutes(10)) // Интервал выполнения
+            .RepeatForever()));
+});
+
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

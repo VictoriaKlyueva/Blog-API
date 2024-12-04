@@ -35,7 +35,10 @@ namespace BackendLaboratory.Service
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
 
-            var bodyBuilder = new BodyBuilder { HtmlBody = string.Format("<h2 style='color:red;'>{0}</h2>", message.Content) };
+            var bodyBuilder = new BodyBuilder 
+            { 
+                HtmlBody = string.Format("<h2 style='color:red;'>{0}</h2>", message.Content)
+            };
 
             if (message.Attachments != null && message.Attachments.Any())
             {
@@ -48,7 +51,8 @@ namespace BackendLaboratory.Service
                         fileBytes = ms.ToArray();
                     }
 
-                    bodyBuilder.Attachments.Add(attachment.FileName, fileBytes, ContentType.Parse(attachment.ContentType));
+                    bodyBuilder.Attachments.Add(attachment.FileName, fileBytes, 
+                        ContentType.Parse(attachment.ContentType));
                 }
             }
 
@@ -70,8 +74,7 @@ namespace BackendLaboratory.Service
                 }
                 catch
                 {
-                    //log an error message or throw an exception, or both.
-                    throw;
+                    Console.WriteLine("Не удалось отправить email");
                 }
                 finally
                 {
@@ -95,8 +98,7 @@ namespace BackendLaboratory.Service
                 }
                 catch
                 {
-                    //log an error message or throw an exception, or both.
-                    throw;
+                    Console.WriteLine("Не удалось отправить email");
                 }
                 finally
                 {

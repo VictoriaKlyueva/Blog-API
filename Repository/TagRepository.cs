@@ -1,9 +1,7 @@
 ﻿using BackendLaboratory.Data;
 using BackendLaboratory.Data.DTO;
-using BackendLaboratory.Migrations;
 using BackendLaboratory.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace BackendLaboratory.Repository
 {
