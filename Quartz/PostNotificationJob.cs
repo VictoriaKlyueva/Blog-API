@@ -1,4 +1,5 @@
 ﻿using BackendLaboratory.Data;
+using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Data.Mailing;
 using BackendLaboratory.Service.IService;
 using Microsoft.EntityFrameworkCore;
@@ -51,5 +52,24 @@ namespace BackendLaboratory.Quartz
                 }
             }
         }
+
+        public async Task NotifySubscribersAboutNewPost(Post newPost)
+        {
+            var community = await _db.Communities.FindAsync(newPost.CommunityId);
+            if (community == null) return;
+
+            var subscribers = await _db.CommunityUsers
+                .Where(cu => cu.CommunityId == community.Id)
+                .Select(cu => cu.User)
+                .ToListAsync();
+
+            foreach (var subscriber in subscribers)
+            {
+                await _emailService.SendEmailAsync(
+                    new Message(subscriber.Email, AppConstants.EmailTitle, community.Name, newPost.Title, newPost.Description)
+                );
+            }
+        }
+
     }
 }

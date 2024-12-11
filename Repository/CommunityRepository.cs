@@ -3,7 +3,9 @@ using BackendLaboratory.Data;
 using BackendLaboratory.Data.DTO;
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Data.Entities.Enums;
+using BackendLaboratory.Quartz;
 using BackendLaboratory.Repository.IRepository;
+using BackendLaboratory.Service.IService;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
 using BackendLaboratory.Util.Validators;
@@ -15,11 +17,13 @@ namespace BackendLaboratory.Repository
     {
         private readonly AppDBContext _db;
         private readonly TokenHelper _tokenHelper;
+        private readonly IEmailService _emailService;
 
-        public CommunityRepository(AppDBContext db, IConfiguration configuration)
+        public CommunityRepository(AppDBContext db, IConfiguration configuration, IEmailService emailService)
         {
             _db = db;
             _tokenHelper = new TokenHelper(configuration);
+            _emailService = emailService;
         }
 
         public async Task<List<CommunityDto>> GetCommunities()
@@ -324,7 +328,7 @@ namespace BackendLaboratory.Repository
                 }
             }
 
-            Data.Entities.Post post = new()
+            Post post = new()
             {
                 Id = Guid.NewGuid(),
                 CreateTime = DateTime.UtcNow,
@@ -354,6 +358,10 @@ namespace BackendLaboratory.Repository
 
                 await _db.SaveChangesAsync();
             }
+
+            var notificationJob = new PostNotificationJob(_emailService, _db);
+            await notificationJob.NotifySubscribersAboutNewPost(post);
+
         }
 
         public async Task SubscribeToCommunity(string token, string communityId)
