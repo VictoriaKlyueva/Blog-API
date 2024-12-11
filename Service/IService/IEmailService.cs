@@ -2,10 +2,8 @@
 
 namespace BackendLaboratory.Service.IService
 {
-    public interface IEmailSender
+    public interface IEmailService
     {
-        void SendEmail(Message message);
-
         Task SendEmailAsync(Message message);
     }
 }

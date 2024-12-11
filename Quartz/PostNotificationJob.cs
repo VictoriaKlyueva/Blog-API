@@ -1,6 +1,7 @@
 ﻿using BackendLaboratory.Data;
+using BackendLaboratory.Data.Mailing;
+using BackendLaboratory.Service.IService;
 using Microsoft.EntityFrameworkCore;
-using NETCore.MailKit.Core;
 using Quartz;
 
 namespace BackendLaboratory.Quartz
@@ -18,11 +19,21 @@ namespace BackendLaboratory.Quartz
 
         public async Task Execute(IJobExecutionContext context)
         {
+
+            Console.WriteLine("Джоба вызвалась");
+
             var communitiesWithNewPosts = await _db.Communities
                 .Where(c => _db.Posts
                     .Where(p =>  p.CommunityId == c.Id)
                         .Any(p => p.CreateTime > DateTime.UtcNow.AddMinutes(-3)))
                 .ToListAsync();
+
+            Console.WriteLine("Комьюнити с новыми постами:");
+            Console.WriteLine(communitiesWithNewPosts.Count());
+            if (communitiesWithNewPosts.Count() > 0)
+            {
+                Console.WriteLine(communitiesWithNewPosts[0].Name);
+            }
 
             foreach (var community in communitiesWithNewPosts)
             {
@@ -31,15 +42,24 @@ namespace BackendLaboratory.Quartz
                     .Select(cu => cu.User)
                     .ToListAsync();
 
+                Console.WriteLine("Подписчики:");
+                Console.WriteLine(subscribers.Count());
                 foreach (var subscriber in subscribers)
                 {
-                    var newPosts = await _db.Posts
-                        .Where(p => p.CommunityId == community.Id && p.CreateTime > DateTime.UtcNow.AddMinutes(-3))
-                        .ToListAsync();
+                    Console.WriteLine(subscriber.FullName);
+                }
 
-                    foreach (var post in newPosts)
+                foreach (var subscriber in subscribers)
+                {
+                    var newPost = await _db.Posts
+                        .FirstOrDefaultAsync(p => p.CommunityId == community.Id && p.CreateTime > DateTime.UtcNow.AddMinutes(-3));
+
+                    if (newPost != null)
                     {
-                        await _emailService.SendAsync(subscriber.Email, AppConstants.EmailTitle, post.Title);
+                        Console.WriteLine("Пост:");
+                        Console.WriteLine(newPost.Id.ToString(), newPost.Title);
+
+                        await _emailService.SendEmailAsync(new Message(subscriber.Email, AppConstants.EmailTitle, newPost.Title));
                     }
                 }
             }

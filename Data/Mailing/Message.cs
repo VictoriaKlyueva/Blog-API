@@ -1,25 +1,19 @@
 ﻿using MimeKit;
-using Microsoft.AspNetCore.Http;
+using System.Xml.Linq;
 
 namespace BackendLaboratory.Data.Mailing
 {
     public class Message
     {
-        public List<MailboxAddress> To { get; set; }
+        public MailboxAddress To { get; set; }
         public string Subject { get; set; }
         public string Content { get; set; }
 
-        public IFormFileCollection Attachments { get; set; }
-
-        public Message(IEnumerable<string> to, string subject, 
-            string content, IFormFileCollection attachments)
+        public Message(string to, string subject, string content)
         {
-            To = new List<MailboxAddress>();
-
-            To.AddRange(to.Select(x => new MailboxAddress("email", x)));
+            To = new MailboxAddress("email", to);
             Subject = subject;
             Content = content;
-            Attachments = attachments;
         }
     }
 }
