@@ -17,26 +17,20 @@ namespace BackendLaboratory.Service
         public async Task SendEmailAsync(Message message)
         {
             var mailMessage = CreateEmailMessage(message);
-
-            Console.WriteLine("SendEmailAsync вызван");
-            Console.WriteLine(message.To);
-            Console.WriteLine(message.Content);
-            Console.WriteLine(message.Content);
-            
-
             await SendAsync(mailMessage);
         }
 
         private MimeMessage CreateEmailMessage(Message message)
         {
             var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress("email", _emailConfig.From));
+            emailMessage.From.Add(new MailboxAddress(AppConstants.EmailFrom, _emailConfig.From));
             emailMessage.To.Add(message.To);
             emailMessage.Subject = message.Subject;
 
             var bodyBuilder = new BodyBuilder 
             { 
-                HtmlBody = string.Format("<h2 style='color:red;'>{0}</h2>", message.Content)
+                HtmlBody = string.Format(AppConstants.MailBody, message.CommunityName, message.ContentTitle, message.ContentDescription)
+
             };
 
             emailMessage.Body = bodyBuilder.ToMessageBody();
@@ -47,11 +41,23 @@ namespace BackendLaboratory.Service
         {
             using (var client = new SmtpClient())
             {
+                try
+                {
                     await client.ConnectAsync(_emailConfig.SmtpServer, _emailConfig.Port, false);
-
                     await client.SendAsync(mailMessage);
 
-                    Console.WriteLine("Ну, должно было отправиться");
+                    Console.WriteLine($"Email отправлен на адрес: {mailMessage.To}");
+                }
+
+                catch
+                {
+                    throw new Exception("Не удалось отправить сообщение");
+                }
+                finally
+                {
+                    await client.DisconnectAsync(true);
+                    client.Dispose();
+                }
             }
         }
     }

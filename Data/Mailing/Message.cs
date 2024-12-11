@@ -1,5 +1,4 @@
 ﻿using MimeKit;
-using System.Xml.Linq;
 
 namespace BackendLaboratory.Data.Mailing
 {
@@ -7,13 +6,21 @@ namespace BackendLaboratory.Data.Mailing
     {
         public MailboxAddress To { get; set; }
         public string Subject { get; set; }
-        public string Content { get; set; }
 
-        public Message(string to, string subject, string content)
+        public string CommunityName { get; set; }
+
+        public string ContentTitle { get; set; }
+
+        public string ContentDescription { get; set; }
+
+        public Message(string to, string subject, string communityName, 
+            string content, string description)
         {
             To = new MailboxAddress("email", to);
             Subject = subject;
-            Content = content;
+            CommunityName = communityName;
+            ContentTitle = content;
+            ContentDescription = description;
         }
     }
 }
