@@ -23,7 +23,7 @@ namespace BackendLaboratory.Quartz
             var communitiesWithNewPosts = await _db.Communities
                 .Where(c => _db.Posts
                     .Where(p =>  p.CommunityId == c.Id)
-                        .Any(p => p.CreateTime > DateTime.UtcNow.AddMinutes(-3)))
+                        .Any(p => p.CreateTime > DateTime.UtcNow.AddMinutes(-1)))
                 .ToListAsync();
 
             if (communitiesWithNewPosts.Count() > 0)

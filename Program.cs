@@ -86,11 +86,11 @@ builder.Services.AddQuartz(q =>
         .WithIdentity(jobKey));
 
     q.AddTrigger(opts => opts
-        .ForJob(jobKey) // Используйте тот же JobKey
+        .ForJob(jobKey)
         .WithIdentity("PostNotificationTrigger")
         .StartNow()
         .WithSimpleSchedule(x => x
-            .WithInterval(TimeSpan.FromMinutes(10)) // Интервал выполнения
+            .WithInterval(TimeSpan.FromMinutes(1))
             .RepeatForever()));
 });
 
