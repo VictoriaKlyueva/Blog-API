@@ -2,14 +2,10 @@
 using BackendLaboratory.Data;
 using BackendLaboratory.Data.DTO;
 using BackendLaboratory.Data.Entities;
-using BackendLaboratory.Migrations;
 using BackendLaboratory.Repository.IRepository;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json.Linq;
-using System.ComponentModel.Design;
 
 namespace BackendLaboratory.Repository
 {
@@ -28,8 +24,6 @@ namespace BackendLaboratory.Repository
         {
             string? userId = _tokenHelper.GetIdFromToken(token);
             User? user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
-
-            // Проверка, что комментарий доступен юзеру
 
             var root = await _db.Comments
                 .Include(c => c.ChildComments)
@@ -190,15 +184,26 @@ namespace BackendLaboratory.Repository
                 .FirstOrDefaultAsync(c => c.Id.ToString() == commentId);
             if (comment == null) { throw new NotFoundException(ErrorMessages.CommentNotFound); }
 
-            if (comment.AuthorId.ToString() != userId)
-            {
-                throw new ForbiddenException(ErrorMessages.CommentForbidden);
-            }
-
             var post = await _db.Posts
                 .FirstOrDefaultAsync(post => post.Id == comment.PostId);
 
             if (post == null) { throw new NotFoundException(ErrorMessages.PostNotFound); }
+
+            if (comment.AuthorId.ToString() != userId)
+            {
+                var communityUser = await _db.CommunityUsers
+                    .FirstOrDefaultAsync(cu => 
+                        cu.UserId.ToString() == userId && 
+                        cu.CommunityId == post.CommunityId);
+                if (communityUser == null)
+                {
+                    throw new ForbiddenException(ErrorMessages.CommentForbidden);
+                }
+                if (communityUser.Role == Data.Entities.Enums.CommunityRole.Substriber)
+                {
+                    throw new ForbiddenException(ErrorMessages.CommentForbidden);
+                }
+            }
 
             comment.Content = AppConstants.EmptyString;
             comment.DeleteDate = DateTime.UtcNow;
