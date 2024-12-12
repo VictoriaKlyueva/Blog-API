@@ -29,7 +29,8 @@ namespace BackendLaboratory.Service
 
             var bodyBuilder = new BodyBuilder 
             { 
-                HtmlBody = string.Format(AppConstants.MailBody, message.CommunityName, message.ContentTitle, message.ContentDescription)
+                HtmlBody = string.Format(AppConstants.MailBody, message.CommunityName, 
+                message.ContentTitle, message.ContentDescription)
 
             };
 
