@@ -1,4 +1,5 @@
-﻿using BackendLaboratory.Data.Entities;
+﻿using BackendLaboratory.Constants;
+using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,9 @@ namespace BackendLaboratory.Controllers
 
         private string GetTokenFromHeader()
         {
-            return HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            return HttpContext.Request.Headers["Authorization"]
+                .ToString()
+                .Replace(AppConstants.Bearer, "");
         }
 
         [HttpPost("login")]
@@ -27,7 +30,7 @@ namespace BackendLaboratory.Controllers
             var tokenResponse = await _userRepository.Login(model);
             if (string.IsNullOrEmpty(tokenResponse.Token)) 
             {
-                return BadRequest();
+                return BadRequest(ErrorMessages.IncorrectTokenResponse);
             }
 
             return Ok(tokenResponse);
@@ -38,14 +41,13 @@ namespace BackendLaboratory.Controllers
         {
             if (!_userRepository.IsUniqueUser(model.Email))
             {
-                return BadRequest();
+                return BadRequest(ErrorMessages.UserIsAlreadyExcist);
             }
 
             var token = await _userRepository.Register(model);
-
             if (token == null)
             {
-                return BadRequest();
+                return BadRequest(ErrorMessages.IncorrectTokenResponse);
             }
 
             return Ok(token);
@@ -59,7 +61,7 @@ namespace BackendLaboratory.Controllers
 
             if (string.IsNullOrEmpty(token))
             {
-                return BadRequest("Token is required for logout.");
+                return BadRequest(ErrorMessages.IncorrectToken);
             }
 
             await _userRepository.Logout(token);

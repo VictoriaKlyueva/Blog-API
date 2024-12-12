@@ -2,6 +2,8 @@
 {
     public class AppConstants
     {
+        public const string Bearer = "Bearer ";
+
         public const string EmptyString = "";
         
         public const int TokenExpiration = 7;

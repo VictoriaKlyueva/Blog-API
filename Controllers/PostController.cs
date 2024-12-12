@@ -19,7 +19,9 @@ namespace BackendLaboratory.Controllers
 
         private string? GetTokenFromHeader()
         {
-            return HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            return HttpContext.Request.Headers["Authorization"]
+                .ToString()
+                .Replace(AppConstants.Bearer, "");
         }
 
         [HttpGet(AppConstants.EmptyString)]
@@ -64,7 +66,7 @@ namespace BackendLaboratory.Controllers
         [Authorize(Policy = "TokenBlackListPolicy")]
         public async Task<IActionResult> AddLike(string postId)
         {
-            string token = GetTokenFromHeader();
+            string? token = GetTokenFromHeader();
 
             await _postRepository.AddLike(token, postId);
             return Ok();
@@ -74,7 +76,7 @@ namespace BackendLaboratory.Controllers
         [Authorize(Policy = "TokenBlackListPolicy")]
         public async Task<IActionResult> DeleteLike(string postId)
         {
-            string token = GetTokenFromHeader();
+            string? token = GetTokenFromHeader();
 
             await _postRepository.DeleteLike(token, postId);
             return Ok();

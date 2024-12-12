@@ -17,6 +17,8 @@
         public const string PageNotFound = "Такой страницы не существует.";
 
         // Other
+        public const string IncorrectToken = "Некорректный или отсутствующий токен.";
+        public const string IncorrectTokenResponse = "Не удалось получить токен.";
         public const string IncorrectId = "Некорректный ID: не удалось извлечь или преобразовать id из токена.";
         public const string ProfileNotFound = "Пользователь не авторизован.";
         public const string UserIsAlreadyExcist = "Такой пользователь уже существует.";
