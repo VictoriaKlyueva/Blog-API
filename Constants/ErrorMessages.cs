@@ -38,6 +38,7 @@
         public const string CommentForbidden = "Это не комментарий пользователя. Пользователь может редактировать и удалять только свои комментарии.";
         public const string CommentIsNotRoot = "Комментарий не является корневым.";
         public const string AddressNotFound = "Такой адресс не существует.";
+        public const string IncorrectCommentContent = "Поле комментарий обязательно и не может состоять только из пробелов.";
 
         public static string ConcreteTagNotFound(string tagId)
         {

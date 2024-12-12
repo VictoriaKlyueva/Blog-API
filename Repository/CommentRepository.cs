@@ -95,6 +95,11 @@ namespace BackendLaboratory.Repository
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 
+            if (string.IsNullOrWhiteSpace(createCommentDto.Content))
+            {
+                throw new BadRequestException(ErrorMessages.IncorrectCommentContent);
+            }
+
             if (createCommentDto.ParentId != null)
             {
                 var parentComment = _db.Comments
@@ -154,6 +159,11 @@ namespace BackendLaboratory.Repository
             var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            if (string.IsNullOrWhiteSpace(updateCommentDto.Content))
+            {
+                throw new BadRequestException(ErrorMessages.IncorrectCommentContent);
+            }
 
             var comment = await _db.Comments
                 .FirstOrDefaultAsync(c => c.Id.ToString() == commentId);
