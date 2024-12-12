@@ -50,7 +50,6 @@ namespace BackendLaboratory.Repository
             return commentTree;
         }
 
-        // Доделать
         private List<CommentDto> GetCommentChilds(Guid commentId)
         {
             var comment = _db.Comments
@@ -70,7 +69,7 @@ namespace BackendLaboratory.Repository
                 ModifiedDate = comment.ModifiedDate,
                 DeleteDate = comment.DeleteDate,
                 AuthorId = comment.AuthorId.ToString(),
-                Author = AppConstants.EmptyString, // Заменить на автора
+                Author = AppConstants.EmptyString,
                 SubComments = comment.ChildComments.Count
             };
 
@@ -152,7 +151,7 @@ namespace BackendLaboratory.Repository
         public async Task EditComment(string commentId, string token, 
             UpdateCommentDto updateCommentDto)
         {
-            string userId = _tokenHelper.GetIdFromToken(token);
+            var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
 
@@ -166,6 +165,8 @@ namespace BackendLaboratory.Repository
             }
 
             comment.Content = updateCommentDto.Content;
+            comment.ModifiedDate = DateTime.UtcNow;
+
             await _db.SaveChangesAsync();
         }
 
@@ -189,7 +190,8 @@ namespace BackendLaboratory.Repository
 
             if (post == null) { throw new NotFoundException(ErrorMessages.PostNotFound); }
 
-            _db.Comments.Remove(comment);
+            comment.Content = AppConstants.EmptyString;
+            comment.DeleteDate = DateTime.UtcNow;
             post.CommentsCount -= 1;
 
             await _db.SaveChangesAsync();
