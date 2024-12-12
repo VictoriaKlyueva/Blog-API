@@ -1,5 +1,4 @@
 ﻿using BackendLaboratory.Data;
-using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Data.Mailing;
 using BackendLaboratory.Service.IService;
 using Microsoft.EntityFrameworkCore;
@@ -20,56 +19,46 @@ namespace BackendLaboratory.Quartz
 
         public async Task Execute(IJobExecutionContext context)
         {
-            var communitiesWithNewPosts = await _db.Communities
-                .Where(c => _db.Posts
-                    .Where(p =>  p.CommunityId == c.Id)
-                        .Any(p => p.CreateTime > DateTime.UtcNow.AddMinutes(-1)))
+            var newEmails = await _db.PostsUsers
+                .Where(c => c.EmailStatus == false)
                 .ToListAsync();
 
-            if (communitiesWithNewPosts.Count() > 0)
+            foreach (var postUser in newEmails)
             {
-                Console.WriteLine(communitiesWithNewPosts[0].Name);
-            }
+                var subscriber = _db.Users.FirstOrDefault(u => u.Id == postUser.UserId);
+                var post = _db.Posts.FirstOrDefault(p => p.Id == postUser.PostId);
 
-            foreach (var community in communitiesWithNewPosts)
-            {
-                var subscribers = await _db.CommunityUsers
-                    .Where(cu => cu.CommunityId == community.Id)
-                    .Select(cu => cu.User)
-                    .ToListAsync();
-
-                foreach (var subscriber in subscribers)
+                if (subscriber == null || post == null)
                 {
-                    var newPost = await _db.Posts
-                        .FirstOrDefaultAsync(p => p.CommunityId == community.Id && p.CreateTime > DateTime.UtcNow.AddMinutes(-3));
+                    _db.PostsUsers.Remove(postUser);
 
-                    if (newPost != null)
+                }
+                else
+                {
+                    var community = _db.Communities.FirstOrDefault(c => c.Id == post.CommunityId);
+
+                    if (community == null)
                     {
-                        await _emailService.SendEmailAsync(
-                            new Message(subscriber.Email, AppConstants.EmailTitle, community.Name, newPost.Title, newPost.Description)
-                        );
+                        _db.PostsUsers.Remove(postUser);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            await _emailService.SendEmailAsync(
+                            new Message(subscriber.Email, AppConstants.EmailTitle, community.Name,
+                                post.Title, post.Description)
+                            );
+                            postUser.EmailStatus = true;
+                            await _db.SaveChangesAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Ошибка отправки email: {ex.Message}");
+                        }
                     }
                 }
             }
         }
-
-        public async Task NotifySubscribersAboutNewPost(Post newPost)
-        {
-            var community = await _db.Communities.FindAsync(newPost.CommunityId);
-            if (community == null) return;
-
-            var subscribers = await _db.CommunityUsers
-                .Where(cu => cu.CommunityId == community.Id)
-                .Select(cu => cu.User)
-                .ToListAsync();
-
-            foreach (var subscriber in subscribers)
-            {
-                await _emailService.SendEmailAsync(
-                    new Message(subscriber.Email, AppConstants.EmailTitle, community.Name, newPost.Title, newPost.Description)
-                );
-            }
-        }
-
     }
 }

@@ -19,6 +19,7 @@ namespace BackendLaboratory.Data
         public DbSet<CommunityUser> CommunityUsers { get; set; }
         public DbSet<PostTag> PostTags { get; set; }
         public DbSet<Like> LikesLink { get; set; }
+        public DbSet<PostsUser> PostsUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -78,6 +79,25 @@ namespace BackendLaboratory.Data
                     j.HasKey(t => new { t.PostId, t.TagId });
                     j.ToTable("PostTags");
                 });
+
+            modelBuilder
+                .Entity<Post>()
+                .HasMany(c => c.Users)
+                .WithMany(s => s.Posts)
+                .UsingEntity<PostsUser>(
+                   j => j
+                    .HasOne(pt => pt.User)
+                    .WithMany(t => t.PostsUsers)
+                    .HasForeignKey(pt => pt.UserId),
+                    j => j
+                        .HasOne(pt => pt.Post)
+                        .WithMany(p => p.PostsUsers)
+                        .HasForeignKey(pt => pt.PostId),
+                    j =>
+                    {
+                        j.HasKey(t => new { t.PostId, t.UserId });
+                        j.ToTable("PostsUsers");
+                    });
 
             modelBuilder.Entity<Comment>()
                .HasMany(c => c.ChildComments)

@@ -340,7 +340,6 @@ namespace BackendLaboratory.Repository
             };
 
             _db.Posts.Add(post);
-            await _db.SaveChangesAsync();
 
             if (createPostDto.Tags != null && createPostDto.Tags.Any())
             {
@@ -351,9 +350,20 @@ namespace BackendLaboratory.Repository
 
                     post.Tags.Add(tag);
                 }
-
-                await _db.SaveChangesAsync();
             }
+
+            // Добавление записей в БД для отправки Email
+            var subscribers = await _db.CommunityUsers
+                .Where(cu => cu.CommunityId == community.Id)
+                .Select(cu => cu.User)
+                .ToListAsync();
+
+            foreach (var subscriber in subscribers)
+            {
+                subscriber.PostsUsers.Add(new PostsUser { Post = post, EmailStatus = false });
+            }
+
+            await _db.SaveChangesAsync();
         }
 
         public async Task SubscribeToCommunity(string token, string communityId)

@@ -47,5 +47,7 @@ namespace BackendLaboratory.Data.Entities
         public List<User> Users { get; set; } = new List<User>();
 
         public List<Like> LikesLink { get; set; } = new List<Like>();
+
+        public List<PostsUser> PostsUsers { get; set; } = new List<PostsUser>();
     }
 }

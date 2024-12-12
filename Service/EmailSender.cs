@@ -49,9 +49,9 @@ namespace BackendLaboratory.Service
                     Console.WriteLine($"Email отправлен на адрес: {mailMessage.To}");
                 }
 
-                catch
+                catch (Exception ex)
                 {
-                    throw new Exception("Не удалось отправить сообщение");
+                    throw new Exception("Не удалось отправить сообщение:", ex);
                 }
                 finally
                 {
