@@ -15,6 +15,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Quartz;
 using BackendLaboratory.Quartz;
+using BackendLaboratory.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,16 +82,28 @@ builder.Services.AddQuartz(q =>
 {
     q.UseMicrosoftDependencyInjectionJobFactory();
 
-    var jobKey = new JobKey("PostNotificationJob");
+    var postNotificationJobKey = new JobKey("PostNotificationJob");
     q.AddJob<PostNotificationJob>(opts => opts
-        .WithIdentity(jobKey));
+        .WithIdentity(postNotificationJobKey));
 
     q.AddTrigger(opts => opts
-        .ForJob(jobKey)
+        .ForJob(postNotificationJobKey)
         .WithIdentity("PostNotificationTrigger")
         .StartNow()
         .WithSimpleSchedule(x => x
             .WithInterval(TimeSpan.FromMinutes(1))
+            .RepeatForever()));
+
+    var cleanBlacklistTokensJob = new JobKey("CleanBlacklistTokensJob");
+    q.AddJob<CleanBlacklistTokensJob>(opts => opts
+        .WithIdentity(cleanBlacklistTokensJob));
+
+    q.AddTrigger(opts => opts
+        .ForJob(cleanBlacklistTokensJob)
+        .WithIdentity("CleanBlacklistTokensTrigger")
+        .StartNow()
+        .WithSimpleSchedule(x => x
+            .WithInterval(TimeSpan.FromDays(1))
             .RepeatForever()));
 });
 

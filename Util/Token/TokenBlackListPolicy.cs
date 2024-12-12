@@ -17,7 +17,10 @@ namespace BackendLaboratory.Util.Token
             using (var scope = _serviceProvider.CreateScope())
             {
                 var appDbContext = scope.ServiceProvider.GetRequiredService<AppDBContext>();
-                string authorizationHeader = _serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+                string authorizationHeader = _serviceProvider
+                    .GetRequiredService<IHttpContextAccessor>()
+                    .HttpContext.Request.Headers["Authorization"]
+                    .FirstOrDefault();
                 if (!string.IsNullOrEmpty(authorizationHeader) && authorizationHeader.StartsWith("Bearer "))
                 {
                     var token = authorizationHeader.Substring("Bearer ".Length);

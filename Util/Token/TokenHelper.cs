@@ -47,10 +47,31 @@ namespace BackendLaboratory.Util.Token
                 return null;
             }
 
-            var jwtToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
-            var id = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid).Value;
+            try
+            {
+                var jwtToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
+                var id = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid).Value;
 
-            return id;
+                return id;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Вероятно, токен не существует, ошибка: ", ex);
+            }
+        }
+
+        public bool IsTokenExpired(string token)
+        {
+            var jwtHandler = new JwtSecurityTokenHandler();
+
+            if (!jwtHandler.CanReadToken(token))
+            {
+                throw new ArgumentException("Invalid token.");
+            }
+
+            var jwtToken = jwtHandler.ReadJwtToken(token);
+
+            return jwtToken.ValidTo < DateTime.UtcNow;
         }
     }
 }
