@@ -6,7 +6,7 @@ namespace BackendLaboratory.Service
     public class TokenBlacklistService : ITokenBlacklistService
     {
         private readonly IConnectionMultiplexer _redis;
-
+            
         public TokenBlacklistService(IConnectionMultiplexer redis)
         {
             _redis = redis;
@@ -15,13 +15,15 @@ namespace BackendLaboratory.Service
         public async Task AddTokenToBlacklistAsync(string token)
         {
             var db = _redis.GetDatabase();
-            await db.StringSetAsync(token, AppConstants.Blacklisted, TimeSpan.FromDays(AppConstants.TokenExpiration));
+            var blacklistedKey = $"{AppConstants.Blacklisted}:{token}";
+            await db.StringSetAsync(blacklistedKey, AppConstants.Blacklisted, TimeSpan.FromDays(AppConstants.TokenExpiration));
         }
 
         public async Task<bool> IsTokenBlacklistedAsync(string token)
         {
             var db = _redis.GetDatabase();
-            return await db.StringGetAsync(token) != RedisValue.Null;
+            var blacklistedKey = $"{AppConstants.Blacklisted}:{token}";
+            return await db.StringGetAsync(blacklistedKey) != RedisValue.Null;
         }
     }
 }

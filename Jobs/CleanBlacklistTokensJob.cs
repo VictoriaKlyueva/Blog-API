@@ -1,35 +1,45 @@
 ﻿using BackendLaboratory.Data.Database;
+using BackendLaboratory.Service.IService;
 using BackendLaboratory.Util.Token;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
+using StackExchange.Redis;
 
 namespace BackendLaboratory.Jobs
 {
     public class CleanBlacklistTokensJob : IJob
     {
-        private AppDBContext _db;
-        private readonly TokenHelper _tokenHelper;
+        private readonly IConnectionMultiplexer _redis;
 
-        public CleanBlacklistTokensJob(AppDBContext context, IConfiguration configuration)
+        public CleanBlacklistTokensJob(IConnectionMultiplexer redis)
         {
-            _db = context;
-            _tokenHelper = new TokenHelper(configuration);
+            _redis = redis;
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
-            var allTokens = await _db.BlackTokens.ToListAsync();
+            var db = _redis.GetDatabase();
 
-            var expiredTokens = allTokens
-                .Where(bl => _tokenHelper.IsTokenExpired(bl.Blacktoken))
-                .ToList();
+            var endpoints = _redis.GetEndPoints();
+            var server = _redis.GetServer(endpoints.First());
 
-            foreach (var token in expiredTokens)
+            var keys = server.Keys(pattern: $"{AppConstants.Blacklisted}:*");
+
+            var expiredTokens = new List<RedisKey>();
+
+            foreach (var key in keys)
             {
-                _db.BlackTokens.Remove(token);
+                var ttl = await db.KeyTimeToLiveAsync(key);
+                if (ttl.HasValue && ttl.Value.TotalSeconds <= 0)
+                {
+                    expiredTokens.Add(key);
+                }
             }
 
-            await _db.SaveChangesAsync();
+            if (expiredTokens.Any())
+            {
+                await db.KeyDeleteAsync(expiredTokens.ToArray());
+            }
         }
     }
 }
