@@ -149,7 +149,7 @@ namespace BackendLaboratory.Repository
             if (!string.IsNullOrEmpty(author))
             {
                 var authorId = _db.Users
-                   .Where(u => u.FullName == author)
+                   .Where(u => u.FullName.Contains(author))
                    .Select(u => u.Id)
                    .FirstOrDefault();
 
