@@ -112,8 +112,8 @@ namespace BackendLaboratory.Data.Database
             modelBuilder.Entity<Community>().HasData(
                 new Community
                 {
-                    Name = "Масонская ложа",
-                    Description = "Место, помещение, где собираются масоны для проведения своих собраний, чаще называемых работами",
+                    Name = AppConstants.MasonName,
+                    Description = AppConstants.MasonDescription,
                     IsClosed = true,
                     SubscribersCount = 0,
                     Id = Guid.Parse("21db62c6-a964-45c1-17e0-08dbea521a96"),
@@ -121,8 +121,8 @@ namespace BackendLaboratory.Data.Database
                 },
                 new Community
                 {
-                    Name = "Следствие вели с Л. Каневским",
-                    Description = "Без длинных предисловий: мужчина умер",
+                    Name = AppConstants.KanevskyName,
+                    Description = AppConstants.KanevskyDescription,
                     IsClosed = false,
                     SubscribersCount = 0,
                     Id = Guid.Parse("c5639aab-3a25-4efc-17e1-08dbea521a96"),
@@ -130,8 +130,8 @@ namespace BackendLaboratory.Data.Database
                 },
                 new Community
                 {
-                    Name = "IT <3",
-                    Description = "Информационные технологии связаны с изучением методов и средств сбора, обработки и передачи данных с целью получения информации нового качества о состоянии объекта, процесса или явления",
+                    Name = AppConstants.ItName,
+                    Description = AppConstants.ItDescription,
                     IsClosed = false,
                     SubscribersCount = 0,
                     Id = Guid.Parse("b9851a35-b836-47f8-17e2-08dbea521a96"),

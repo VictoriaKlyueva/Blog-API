@@ -39,5 +39,16 @@
             <h2 class='title'>Вышел новый пост в вашем сообществе: {0}</h2>
             <h3 class='subtitle'>{1}</h3>
             <p class='description'>{2}</p>";
+        
+        // Community titiles
+        public const string MasonName = "Масонская ложа";
+        public const string KanevskyName = "Следствие вели с Л. Каневским";
+        public const string ItName = "IT <3";
+
+        // Community descriptions
+
+        public const string MasonDescription = "Место, помещение, где собираются масоны для проведения своих собраний, чаще называемых работами";
+        public const string KanevskyDescription = "Без длинных предисловий: мужчина умер";
+        public const string ItDescription = "Информационные технологии связаны с изучением методов и средств сбора, обработки и передачи данных с целью получения информации нового качества о состоянии объекта, процесса или явления";
     }
 }
