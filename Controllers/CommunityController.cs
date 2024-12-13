@@ -20,7 +20,9 @@ namespace BackendLaboratory.Controllers
 
         private string GetTokenFromHeader()
         {
-            return HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            return HttpContext.Request.Headers["Authorization"]
+                .ToString()
+                .Replace(AppConstants.Bearer, "");
         }
 
         [HttpGet(AppConstants.EmptyString)]

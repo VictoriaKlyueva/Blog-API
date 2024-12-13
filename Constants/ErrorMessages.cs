@@ -17,6 +17,8 @@
         public const string PageNotFound = "Такой страницы не существует.";
 
         // Other
+        public const string IncorrectToken = "Некорректный или отсутствующий токен.";
+        public const string IncorrectTokenResponse = "Не удалось получить токен.";
         public const string IncorrectId = "Некорректный ID: не удалось извлечь или преобразовать id из токена.";
         public const string ProfileNotFound = "Пользователь не авторизован.";
         public const string UserIsAlreadyExcist = "Такой пользователь уже существует.";
@@ -38,6 +40,7 @@
         public const string CommentForbidden = "Это не комментарий пользователя. Пользователь может редактировать и удалять только свои комментарии.";
         public const string CommentIsNotRoot = "Комментарий не является корневым.";
         public const string AddressNotFound = "Такой адресс не существует.";
+        public const string IncorrectCommentContent = "Поле комментарий обязательно и не может состоять только из пробелов.";
 
         public static string ConcreteTagNotFound(string tagId)
         {

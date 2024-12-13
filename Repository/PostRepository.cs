@@ -215,7 +215,7 @@ namespace BackendLaboratory.Repository
                 .Take(size);
         }
 
-        public async Task CreatePost(string token, CreatePostDto createPostDto)
+        public async Task CreatePost(string? token, CreatePostDto createPostDto)
         {
             var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
@@ -385,7 +385,7 @@ namespace BackendLaboratory.Repository
             return postFullDto;
         }
 
-        public async Task AddLike(string token, string postId)
+        public async Task AddLike(string? token, string postId)
         {
             var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
@@ -438,7 +438,7 @@ namespace BackendLaboratory.Repository
             await _db.SaveChangesAsync();
         }
 
-        public async Task DeleteLike(string token, string postId)
+        public async Task DeleteLike(string? token, string postId)
         {
             var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
