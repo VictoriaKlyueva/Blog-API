@@ -1,4 +1,3 @@
-using BackendLaboratory.Data;
 using BackendLaboratory.Data.Mailing;
 using BackendLaboratory.Repository;
 using BackendLaboratory.Repository.IRepository;
@@ -16,6 +15,8 @@ using System.Text.Json.Serialization;
 using Quartz;
 using BackendLaboratory.Quartz;
 using BackendLaboratory.Jobs;
+using BackendLaboratory.Data.Database;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,11 @@ builder.Services.AddDbContext<AppDBContext>(options =>
 
 builder.Services.AddDbContext<GarContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("GarConnection")));
+
+// Подключение к Redis
+var redisConnectionString = "localhost";
+var redis = ConnectionMultiplexer.Connect(redisConnectionString);
+builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
 var emailConfig = builder.Configuration
         .GetSection("EmailConfiguration")
@@ -120,7 +126,8 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IAuthorizationHandler, TokenBlackListPolicy>();
-builder.Services.AddScoped<IEmailService, EmailSender>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ITokenBlacklistService, TokenBlacklistService>();
 
 // Configure JWT authentication
 var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");

@@ -1,4 +1,4 @@
-﻿using BackendLaboratory.Data;
+﻿using BackendLaboratory.Data.Database;
 using BackendLaboratory.Data.Mailing;
 using BackendLaboratory.Service.IService;
 using Microsoft.EntityFrameworkCore;

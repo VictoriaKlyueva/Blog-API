@@ -6,6 +6,8 @@
         
         public const int TokenExpiration = 7;
 
+        public const string Blacklisted = "blacklisted";
+
         public const string EmailTitle = "Ура новый пост в вашем сообществе! Бегом смотреть!";
 
         public const string EmailFrom = "Рассылка лучшего блога в мире";

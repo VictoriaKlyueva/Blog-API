@@ -5,11 +5,11 @@ using MailKit.Net.Smtp;
 
 namespace BackendLaboratory.Service
 {
-    public class EmailSender : IEmailService
+    public class EmailService : IEmailService
     {
         private readonly EmailConfiguration _emailConfig;
 
-        public EmailSender(EmailConfiguration emailConfig)
+        public EmailService(EmailConfiguration emailConfig)
         {
             _emailConfig = emailConfig;
         }

@@ -1,4 +1,4 @@
-﻿using BackendLaboratory.Data;
+﻿using BackendLaboratory.Data.Database;
 using BackendLaboratory.Util.Token;
 using Microsoft.EntityFrameworkCore;
 using Quartz;

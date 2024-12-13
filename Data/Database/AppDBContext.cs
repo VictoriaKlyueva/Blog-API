@@ -1,7 +1,7 @@
 ﻿using BackendLaboratory.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackendLaboratory.Data
+namespace BackendLaboratory.Data.Database
 {
     public class AppDBContext : DbContext
     {
@@ -111,13 +111,14 @@ namespace BackendLaboratory.Data
         private void AddAdminData(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Community>().HasData(
-                new Community { 
-                    Name = "Масонская ложа", 
-                    Description = "Место, помещение, где собираются масоны для проведения своих собраний, чаще называемых работами", 
+                new Community
+                {
+                    Name = "Масонская ложа",
+                    Description = "Место, помещение, где собираются масоны для проведения своих собраний, чаще называемых работами",
                     IsClosed = true,
                     SubscribersCount = 0,
-                    Id = Guid.Parse("21db62c6-a964-45c1-17e0-08dbea521a96"), 
-                    CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106622"), DateTimeKind.Utc) 
+                    Id = Guid.Parse("21db62c6-a964-45c1-17e0-08dbea521a96"),
+                    CreateTime = DateTime.SpecifyKind(DateTime.Parse("2023-11-21T12:24:15.8106622"), DateTimeKind.Utc)
                 },
                 new Community
                 {

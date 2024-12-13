@@ -1,5 +1,5 @@
 ﻿using BackendLaboratory.Constants;
-using BackendLaboratory.Data;
+using BackendLaboratory.Data.Database;
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Data.Entities.Enums;
 using BackendLaboratory.Repository.IRepository;

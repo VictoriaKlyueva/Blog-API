@@ -1,7 +1,7 @@
 ﻿using BackendLaboratory.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackendLaboratory.Data
+namespace BackendLaboratory.Data.Database
 {
     public partial class GarContext : DbContext
     {

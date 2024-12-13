@@ -1,4 +1,4 @@
-﻿using BackendLaboratory.Data;
+﻿using BackendLaboratory.Data.Database;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BackendLaboratory.Util.Token
