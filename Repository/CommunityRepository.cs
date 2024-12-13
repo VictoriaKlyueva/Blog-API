@@ -113,7 +113,7 @@ namespace BackendLaboratory.Repository
                 (userId == null || 
                 _db.CommunityUsers
                     .FirstOrDefault(cu =>
-                        cu.CommunityId.ToString() == id && cu.UserId.ToString() == userId) != null))
+                        cu.CommunityId.ToString() == id && cu.UserId.ToString() == userId) == null))
             {
                 throw new ForbiddenException(ErrorMessages.CommunityPostsForbidden);
             }

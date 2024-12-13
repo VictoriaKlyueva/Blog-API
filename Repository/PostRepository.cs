@@ -4,6 +4,7 @@ using BackendLaboratory.Data.DTO;
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Data.Entities.Enums;
 using BackendLaboratory.Repository.IRepository;
+using BackendLaboratory.Service.IService;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
 using BackendLaboratory.Util.Validators;
@@ -16,12 +17,15 @@ namespace BackendLaboratory.Repository
         private readonly AppDBContext _db;
         private readonly GarContext _gar;
         private readonly TokenHelper _tokenHelper;
+        private readonly ITokenBlacklistService _tokenBlacklistService;
 
-        public PostRepository(AppDBContext db, GarContext gar, IConfiguration configuration)
+        public PostRepository(AppDBContext db, GarContext gar, 
+            IConfiguration configuration, ITokenBlacklistService tokenBlacklistService)
         {
             _db = db;
             _gar = gar;
             _tokenHelper = new TokenHelper(configuration);
+            _tokenBlacklistService = tokenBlacklistService;
         }
 
         public async Task<PostPagedListDto> GetPosts(List<Guid>? tags, string? author, 
@@ -30,6 +34,14 @@ namespace BackendLaboratory.Repository
         {
             string? userId = _tokenHelper.GetIdFromToken(token);
             User? user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+
+            if (token != null)
+            {
+                if (await _tokenBlacklistService.IsTokenBlacklistedAsync(token))
+                {
+                    user = null;
+                }
+            }
 
             QueryValidation.IsPostDataValid(page, size, min, max);
 
@@ -184,6 +196,14 @@ namespace BackendLaboratory.Repository
                     post.CommunityId == null || _db.Communities.Any(community =>
                         community.Id == post.CommunityId && !community.IsClosed
                     ));
+
+                var posts2 = posts.Where(post =>
+                    post.CommunityId == null || _db.Communities.Any(community =>
+                        community.Id == post.CommunityId && !community.IsClosed
+                    )).ToList();
+
+                Console.WriteLine("АААААААААА");
+                Console.WriteLine(posts2.Count());
             }
 
             if (onlyMyCommunities)
@@ -219,7 +239,6 @@ namespace BackendLaboratory.Repository
 
         public async Task CreatePost(string? token, CreatePostDto createPostDto)
         {
-
             PostsValidator.IsPostDataValid(createPostDto);
 
             var userId = _tokenHelper.GetIdFromToken(token);
