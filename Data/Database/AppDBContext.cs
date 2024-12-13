@@ -1,5 +1,6 @@
 ﻿using BackendLaboratory.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace BackendLaboratory.Data.Database
 {
@@ -22,6 +23,17 @@ namespace BackendLaboratory.Data.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            ConfigureCommunityUser(modelBuilder);
+            ConfigureLikesLink(modelBuilder);
+            ConfigurePostTag(modelBuilder);
+            ConfigurePostsUser(modelBuilder);
+            ConfigureComment(modelBuilder);
+
+            AddAdminData(modelBuilder);
+        }
+
+        public void ConfigureCommunityUser(ModelBuilder modelBuilder)
+        {
             modelBuilder
                 .Entity<Community>()
                 .HasMany(c => c.Users)
@@ -40,7 +52,10 @@ namespace BackendLaboratory.Data.Database
                     j.HasKey(t => new { t.CommunityId, t.UserId });
                     j.ToTable("CommunityUsers");
                 });
+        }
 
+        public void ConfigureLikesLink(ModelBuilder modelBuilder)
+        {
             modelBuilder
                 .Entity<Post>()
                 .HasMany(c => c.Users)
@@ -59,7 +74,10 @@ namespace BackendLaboratory.Data.Database
                     j.HasKey(t => new { t.PostId, t.UserId });
                     j.ToTable("Likes");
                 });
+        }
 
+        public void ConfigurePostTag(ModelBuilder modelBuilder)
+        {
             modelBuilder
                 .Entity<Post>()
                 .HasMany(c => c.Tags)
@@ -78,7 +96,10 @@ namespace BackendLaboratory.Data.Database
                     j.HasKey(t => new { t.PostId, t.TagId });
                     j.ToTable("PostTags");
                 });
+        }
 
+        public void ConfigurePostsUser(ModelBuilder modelBuilder)
+        {
             modelBuilder
                 .Entity<Post>()
                 .HasMany(c => c.Users)
@@ -97,14 +118,15 @@ namespace BackendLaboratory.Data.Database
                         j.HasKey(t => new { t.PostId, t.UserId });
                         j.ToTable("PostsUsers");
                     });
+        }
 
+        public void ConfigureComment(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<Comment>()
                .HasMany(c => c.ChildComments)
                .WithOne(c => c.ParentComment)
                .HasForeignKey(c => c.ParentId)
                .OnDelete(DeleteBehavior.Cascade);
-
-            AddAdminData(modelBuilder);
         }
 
         private void AddAdminData(ModelBuilder modelBuilder)
