@@ -20,6 +20,8 @@ namespace BackendLaboratory.Data.DTO
         [MaxLength(1000)]
         public string? Image { get; set; }
 
+        public string? AddressId { get; set; }
+
         [Required]
         public List<Guid> Tags { get; set; } = new List<Guid>();
     }

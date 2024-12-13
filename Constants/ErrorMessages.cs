@@ -18,6 +18,7 @@
 
         // Other
         public const string IncorrectToken = "Некорректный или отсутствующий токен.";
+        public const string IncorrectGuid = "Id не соответствует формату Guid.";
         public const string IncorrectTokenResponse = "Не удалось получить токен.";
         public const string IncorrectId = "Некорректный ID: не удалось извлечь или преобразовать id из токена.";
         public const string ProfileNotFound = "Пользователь не авторизован.";
@@ -41,6 +42,9 @@
         public const string CommentIsNotRoot = "Комментарий не является корневым.";
         public const string AddressNotFound = "Такой адресс не существует.";
         public const string IncorrectCommentContent = "Поле комментарий обязательно и не может состоять только из пробелов.";
+        public const string IncorrectReadingTime = "Время прочтения может быть только положительным целым числом.";
+        public const string IncorrectImage = "Некорректный формат фото.";
+        public const string IncorrectPostTags = "У поста длолжен быть хотя бы один тэг.";
 
         public static string ConcreteTagNotFound(string tagId)
         {

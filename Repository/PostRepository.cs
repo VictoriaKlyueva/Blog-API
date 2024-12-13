@@ -14,11 +14,13 @@ namespace BackendLaboratory.Repository
     public class PostRepository : IPostRepository
     {
         private readonly AppDBContext _db;
+        private readonly GarContext _gar;
         private readonly TokenHelper _tokenHelper;
 
-        public PostRepository(AppDBContext db, IConfiguration configuration)
+        public PostRepository(AppDBContext db, GarContext gar, IConfiguration configuration)
         {
             _db = db;
+            _gar = gar;
             _tokenHelper = new TokenHelper(configuration);
         }
 
@@ -217,6 +219,9 @@ namespace BackendLaboratory.Repository
 
         public async Task CreatePost(string? token, CreatePostDto createPostDto)
         {
+
+            PostsValidator.IsPostDataValid(createPostDto);
+
             var userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
@@ -230,6 +235,26 @@ namespace BackendLaboratory.Repository
                 }
             }
 
+            Guid guid;
+            if (!Guid.TryParse(createPostDto.AddressId, out guid))
+            {
+                throw new BadRequestException(ErrorMessages.IncorrectGuid);
+            }
+
+            var address = await _gar.AsAddrObjs
+                .FirstOrDefaultAsync(a => a.ObjectGuid.ToString() == createPostDto.AddressId);
+
+            if (address == null)
+            {
+                var house = await _gar.AsHouses
+                    .FirstOrDefaultAsync(h => h.ObjectGuid.ToString() == createPostDto.AddressId);
+
+                if (house == null)
+                {
+                    throw new NotFoundException(ErrorMessages.AddressNotFound);
+                }
+            }
+
             Post post = new()
             {
                 Id = Guid.NewGuid(),
@@ -238,15 +263,14 @@ namespace BackendLaboratory.Repository
                 Description = createPostDto.Description,
                 ReadingTime = createPostDto.ReadingTime,
                 Image = createPostDto.Image,
-                AuthorId = new Guid(userId),
+                AuthorId = new Guid(userId!),
                 CommunityId = null,
-                AddressId = null, // Исправить на адрес
+                AddressId = new Guid(createPostDto.AddressId),
                 Likes = 0,
                 CommentsCount = 0
             };
 
             _db.Posts.Add(post);
-            await _db.SaveChangesAsync();
 
             if (createPostDto.Tags != null && createPostDto.Tags.Any())
             {
@@ -257,9 +281,9 @@ namespace BackendLaboratory.Repository
 
                     post.Tags.Add(tag);
                 }
-
-                await _db.SaveChangesAsync();
             }
+
+            await _db.SaveChangesAsync();
         }
 
         public async Task<PostFullDto> GetPostInfo(string? token, string postId)

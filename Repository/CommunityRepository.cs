@@ -8,18 +8,21 @@ using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Token;
 using BackendLaboratory.Util.Validators;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace BackendLaboratory.Repository
 {
     public class CommunityRepository : ICommunityRepository
     {
         private readonly AppDBContext _db;
+        private readonly GarContext _gar;
         private readonly TokenHelper _tokenHelper;
 
-        public CommunityRepository(AppDBContext db, IConfiguration configuration)
+        public CommunityRepository(AppDBContext db, GarContext gar, IConfiguration configuration)
         {
             _db = db;
             _tokenHelper = new TokenHelper(configuration);
+            _gar = gar;
         }
 
         public async Task<List<CommunityDto>> GetCommunities()
@@ -293,10 +296,18 @@ namespace BackendLaboratory.Repository
 
         public async Task CreateCommunityPost(string token, string communityId, CreatePostDto createPostDto)
         {
+            PostsValidator.IsPostDataValid(createPostDto);
+
             // Check authorization
             string userId = _tokenHelper.GetIdFromToken(token);
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
             if (user == null) { throw new UnauthorizedException(ErrorMessages.ProfileNotFound); }
+
+            Guid guid;
+            if (!Guid.TryParse(createPostDto.AddressId, out guid))
+            {
+                throw new BadRequestException(ErrorMessages.IncorrectGuid);
+            }
 
             // Check is community found
             var community = await _db.Communities.FirstOrDefaultAsync(c => c.Id.ToString() == communityId);
@@ -324,6 +335,20 @@ namespace BackendLaboratory.Repository
                 }
             }
 
+            var address = _gar.AsAddrObjs
+                .FirstOrDefaultAsync(a => a.ObjectGuid.ToString() == createPostDto.AddressId);
+
+            if (address == null)
+            {
+                var house = _gar.AsHouses
+                    .FirstOrDefaultAsync(a => a.ObjectGuid.ToString() == createPostDto.AddressId);
+
+                if (house == null)
+                {
+                    throw new NotFoundException(ErrorMessages.AddressNotFound);
+                }
+            }
+
             Post post = new()
             {
                 Id = Guid.NewGuid(),
@@ -332,9 +357,9 @@ namespace BackendLaboratory.Repository
                 Description = createPostDto.Description,
                 ReadingTime = createPostDto.ReadingTime,
                 Image = createPostDto.Image,
-                AuthorId = new Guid(userId),
+                AuthorId = new Guid(userId!),
                 CommunityId = new Guid(communityId),
-                AddressId = null, // Исправить на адрес
+                AddressId = new Guid(createPostDto.AddressId!),
                 Likes = 0,
                 CommentsCount = 0
             };
