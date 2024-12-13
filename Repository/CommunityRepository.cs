@@ -287,8 +287,8 @@ namespace BackendLaboratory.Repository
                     cu.CommunityId.ToString() == communityId
                 );
             if (communityUser == null)
-            { 
-                return null;
+            {
+                throw new NotFoundException(ErrorMessages.UserIsNotSubstribed);
             }
             
             return communityUser.Role;
