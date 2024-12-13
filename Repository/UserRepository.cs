@@ -3,12 +3,12 @@ using BackendLaboratory.Data.Database;
 using BackendLaboratory.Data.DTO;
 using BackendLaboratory.Data.Entities;
 using BackendLaboratory.Repository.IRepository;
+using BackendLaboratory.Service.IService;
 using BackendLaboratory.Util.CustomExceptions.Exceptions;
 using BackendLaboratory.Util.Password;
 using BackendLaboratory.Util.Token;
 using BackendLaboratory.Util.Validators;
 using Microsoft.EntityFrameworkCore;
-using System.Numerics;
 
 namespace BackendLaboratory.Repository
 {
@@ -16,11 +16,13 @@ namespace BackendLaboratory.Repository
     {
         private readonly AppDBContext _db;
         private readonly TokenHelper _tokenHelper;
+        private readonly ITokenBlacklistService _tokenBlacklistService;
 
-        public UserRepository(AppDBContext db, IConfiguration configuration)
+        public UserRepository(AppDBContext db, IConfiguration configuration, ITokenBlacklistService tokenBlacklistService)
         {
             _db = db;
             _tokenHelper = new TokenHelper(configuration);
+            _tokenBlacklistService = tokenBlacklistService;
         }
 
         public bool IsUniqueUser(string email)
@@ -122,10 +124,9 @@ namespace BackendLaboratory.Repository
         {
             var id = _tokenHelper.GetIdFromToken(token);
 
-            if (Guid.TryParse(id, out Guid doctorId) && doctorId != Guid.Empty)
+            if (Guid.TryParse(id, out Guid userId) && userId != Guid.Empty)
             {
-                await _db.BlackTokens.AddAsync(new BlackToken { Blacktoken = token });
-                await _db.SaveChangesAsync();
+                await _tokenBlacklistService.AddTokenToBlacklistAsync(token);
             }
             else
             {

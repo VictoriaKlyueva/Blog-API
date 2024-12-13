@@ -27,7 +27,7 @@ builder.Services.AddDbContext<GarContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("GarConnection")));
 
 // Подключение к Redis
-var redisConnectionString = "localhost";
+var redisConnectionString = "localhost:6379,abortConnect=false";
 var redis = ConnectionMultiplexer.Connect(redisConnectionString);
 builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
@@ -117,6 +117,7 @@ builder.Services.AddQuartz(q =>
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ITokenBlacklistService, TokenBlacklistService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<ICommunityRepository, CommunityRepository>();
@@ -127,7 +128,6 @@ builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IAuthorizationHandler, TokenBlackListPolicy>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<ITokenBlacklistService, TokenBlacklistService>();
 
 // Configure JWT authentication
 var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
